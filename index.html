@@ -183,8 +183,6 @@ cursor: pointer; transition: border-color .15s, transform .15s; white-space: now
 .hud .pill:hover { border-color: var(--gold); transform: translateY(-1px); }
 .hud .pill .ic { color: var(--gold); font-size: 16px; }
 .hud .pill b { color: var(--gold); font-size: 15px; }
-.hud .pill.quest { max-width: 46vw; overflow: hidden; text-overflow: ellipsis; }
-.hud .pill.quest small { color: var(--ink-3); }
 .hud .spacer { flex: 1; }
 .hud .ico-btn {
 width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line);
@@ -508,12 +506,81 @@ animation: toastin .38s cubic-bezier(.2,.9,.3,1.2);
 @media (max-width: 640px) {
 .rooms { grid-template-columns: 1fr; }
 .win-row { gap: 16px; }
-.hud .pill.quest { max-width: 100%; order: 10; }
 .scene { height: 190px; }
 }
 body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after {
 animation-duration: .01s !important; animation-iteration-count: 1 !important;
 transition-duration: .01s !important;
+}
+
+/* ---- v3.0 怀表渐变 / 住户小Z / 对话框 / 奖杯 ---- */
+@property --sky-a { syntax: "<color>"; inherits: true; initial-value: #131c30; }
+@property --sky-b { syntax: "<color>"; inherits: true; initial-value: #2c3a55; }
+body { transition: --sky-a 1.2s ease, --sky-b 1.2s ease; }
+#zface {
+position: absolute; bottom: 8px; left: 0; z-index: 24;
+width: 34px; height: 60px; cursor: pointer; user-select: none;
+filter: drop-shadow(0 3px 4px rgba(0,0,0,.35));
+}
+#zface svg { width: 34px; height: 60px; display: block; }
+#zface .zpart { transform-box: fill-box; transform-origin: 50% 8%; }
+#zface.walking .legA, #zface.walking .armB { animation: stepA .46s linear infinite; }
+#zface.walking .legB, #zface.walking .armA { animation: stepB .46s linear infinite; }
+@keyframes stepA { 50% { transform: rotate(19deg); } }
+@keyframes stepB { 50% { transform: rotate(-19deg); } }
+#zface.wave .armB { animation: howdy .34s ease-in-out 4; }
+@keyframes howdy { 40%,60% { transform: rotate(-138deg); } 50% { transform: rotate(-162deg); } }
+#dlg {
+position: fixed; left: 50%; bottom: 18px; transform: translate(-50%, 0);
+width: min(92vw, 620px); z-index: 95; display: none;
+background: linear-gradient(160deg, #1d2536, #12182a);
+border: 1px solid rgba(240,196,106,.4); border-radius: 14px;
+padding: 14px 18px; color: #f2ecd9; cursor: pointer;
+box-shadow: 0 18px 46px rgba(0,0,0,.5);
+}
+#dlg.on { display: flex; gap: 14px; animation: dlgin .25s ease-out; }
+@keyframes dlgin { from { transform: translate(-50%, 26px); opacity: 0; } }
+.dlg-ava {
+width: 54px; height: 54px; flex: none; border-radius: 50%;
+background: radial-gradient(circle at 35% 30%, #2e3a56, #1a2236);
+border: 2px solid rgba(240,196,106,.5);
+display: flex; align-items: center; justify-content: center;
+}
+.dlg-ava svg { width: 40px; height: 36px; }
+.dlg-name { font-size: 11px; letter-spacing: .3em; color: #f0c46a; margin-bottom: 4px; }
+.dlg-text { font-size: 14.5px; line-height: 1.9; min-height: 56px; }
+.dlg-next {
+position: absolute; right: 14px; bottom: 8px; color: #f0c46a;
+font-size: 13px; animation: breathe 1.4s infinite;
+}
+.ach-list { display: flex; flex-direction: column; gap: 8px; }
+.ach-row {
+display: flex; align-items: center; gap: 13px;
+background: var(--paper-3); border: 2px solid var(--line);
+border-radius: var(--r-sm); padding: 9px 13px;
+}
+.ach-row .cup {
+width: 38px; height: 38px; flex: none; border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+font-size: 19px; color: #fff;
+}
+.cup-bronze { background: radial-gradient(circle at 32% 28%, #d09272, #8a5136 70%); }
+.cup-silver { background: radial-gradient(circle at 32% 28%, #e6ecf4, #8a94a6 70%); }
+.cup-gold   { background: radial-gradient(circle at 32% 28%, #f8df9a, #c9880e 70%); }
+.cup-plat   { background: radial-gradient(circle at 32% 28%, #e2f4fa, #77b8cc 65%, #4a8aa0); }
+.ach-row .atx { min-width: 0; }
+.ach-row .atx b { font-size: 13.5px; display: block; }
+.ach-row .atx span { font-size: 11.5px; color: var(--ink-2); }
+.ach-row.lock { opacity: .55; }
+.ach-row.lock .cup { filter: grayscale(1) brightness(.8); }
+.toast.trophy { border-color: #d9a441; background: linear-gradient(160deg, #2b3050, #171d33); }
+.toast.trophy .cup {
+width: 32px; height: 32px; font-size: 16px; border-radius: 50%;
+display: flex; align-items: center; justify-content: center; color: #fff; flex: none;
+}
+.tmenu-item.kfocus {
+background: rgba(212,136,15,.22); border-color: var(--gold-2);
+transform: translateX(6px); box-shadow: 0 0 22px rgba(240,196,106,.18);
 }
 
 /* ---- 全屋统一滚动条 ---- */
@@ -560,6 +627,9 @@ transition-duration: .01s !important;
 <symbol id="i-tv" viewBox="0 0 24 24"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></symbol>
 <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
 <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+<symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></symbol>
+<symbol id="i-watch" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 10v2l1 1"/><path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05"/><path d="m16.13 16.34-.81 4.05a2 2 0 0 1-2 1.61h-2.68a2 2 0 0 1-2-1.61l-.78-4.05"/></symbol>
 <!-- 手绘：小家徽标（屋顶 + 灯窗） -->
 <symbol id="i-mark" viewBox="0 0 48 44">
 <path d="M6 20 24 5l18 15" />
@@ -587,12 +657,13 @@ transition-duration: .01s !important;
 <div class="title-menu">
 <button class="tmenu-item" id="t-start"><svg class="ic"><use href="#i-house"/></svg>进入小家</button>
 <button class="tmenu-item" id="t-gallery"><svg class="ic"><use href="#i-image"/></svg>回忆画廊</button>
+<button class="tmenu-item" id="t-achv"><svg class="ic"><use href="#i-trophy"/></svg>奖杯</button>
 <button class="tmenu-item" id="t-quests"><svg class="ic"><use href="#i-list-todo"/></svg>任务</button>
 <button class="tmenu-item" id="t-credits"><svg class="ic"><use href="#i-image"/></svg>制作名单</button>
 <button class="tmenu-item" id="t-settings"><svg class="ic"><use href="#i-settings"/></svg>设置</button>
 </div>
 <div class="title-save" id="title-save"></div>
-<div class="title-foot"><span>v2.2.1 · DELUXE</span><span>© 2026 小Z 的小家</span></div>
+<div class="title-foot"><span>v3.0.0 · DELUXE</span><span>© 2026 小Z 的小家</span></div>
 </div>
 <!-- ③ 小家主画面 -->
 <div class="screen" id="screen-house">
@@ -601,13 +672,14 @@ transition-duration: .01s !important;
 <div class="cloud c3"></div>
 <div class="hud">
 <span class="pill" id="pill-stardust"><svg class="ic"><use href="#i-sparkles"/></svg><b id="stardust-num">0</b></span>
-<span class="pill quest" id="pill-quest"><svg class="ic"><use href="#i-list-todo"/></svg><span id="quest-brief">…</span></span>
 <span class="spacer"></span>
 <button class="ico-btn" id="btn-ledger" data-tip="小金库"><svg class="ic"><use href="#i-coins"/></svg></button>
 <button class="ico-btn" data-modal="quests"   data-tip="任务"><svg class="ic"><use href="#i-list-todo"/></svg></button>
 <button class="ico-btn" data-modal="shop"     data-tip="商城"><svg class="ic"><use href="#i-shopping-bag"/></svg></button>
 <button class="ico-btn" data-modal="gallery"  data-tip="画廊"><svg class="ic"><use href="#i-image"/></svg></button>
+<button class="ico-btn" data-modal="achv"    data-tip="奖杯"><svg class="ic"><use href="#i-trophy"/></svg></button>
 <button class="ico-btn" id="btn-firework"     data-tip="烟花" style="display:none"><svg class="ic"><use href="#i-sparkles"/></svg></button>
+<button class="ico-btn" id="btn-clock"        data-tip="怀表"><svg class="ic"><use href="#i-watch"/></svg></button>
 <button class="ico-btn" id="btn-music"        data-tip="音乐"><svg class="ic"><use href="#i-music"/></svg></button>
 <button class="ico-btn" data-modal="settings" data-tip="设置"><svg class="ic"><use href="#i-settings"/></svg></button>
 <button class="ico-btn" id="btn-title"        data-tip="标题"><svg class="ic"><use href="#i-house"/></svg></button>
@@ -645,6 +717,19 @@ transition-duration: .01s !important;
 <path d="M15.5 22.5q1.5 1.4 3 0" stroke="#f7ead2" stroke-width="1.2" fill="none" stroke-linecap="round"/>
 </g>
 </svg></div>
+<div id="zface"><svg viewBox="0 0 36 60">
+<g class="zpart legA"><rect x="11" y="40" width="6" height="15" rx="3" fill="#3d4a63"/></g>
+<g class="zpart legB"><rect x="19" y="40" width="6" height="15" rx="3" fill="#46577a"/></g>
+<rect x="9" y="24" width="18" height="18" rx="6" fill="#5a6f92"/>
+<rect x="13" y="27" width="10" height="13" rx="2.5" fill="#d9a441"/>
+<g class="zpart armA"><rect x="3" y="27" width="5.5" height="14" rx="2.75" fill="#46577a"/></g>
+<g class="zpart armB"><rect x="27.5" y="27" width="5.5" height="14" rx="2.75" fill="#5a6f92"/></g>
+<circle cx="18" cy="15" r="11" fill="#f2e0c8"/>
+<path d="M7 13c1-7 7-9 11-9s10 2 11 9c-3-3-7-4-11-4s-8 1-11 4z" fill="#c98a3a"/>
+<circle cx="14" cy="16.5" r="1.5" fill="#2c2418"/><circle cx="22" cy="16.5" r="1.5" fill="#2c2418"/>
+<path d="M15.5 20.5q2.5 2 5 0" stroke="#2c2418" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<circle cx="10.5" cy="19" r="1.6" fill="#e8a08a" opacity=".55"/><circle cx="25.5" cy="19" r="1.6" fill="#e8a08a" opacity=".55"/>
+</svg></div>
 </div>
 <!-- ④ 房间内景 -->
 <div id="room-overlay">
@@ -665,6 +750,19 @@ transition-duration: .01s !important;
 <div id="iris"></div>
 <div class="modal-mask" id="modal-mask"><div class="modal" id="modal-box"></div></div>
 <div id="toasts"></div>
+<div id="dlg">
+<div class="dlg-ava"><svg viewBox="0 0 36 32">
+<circle cx="18" cy="17" r="11" fill="#f2e0c8"/>
+<path d="M7 15c1-7 7-9 11-9s10 2 11 9c-3-3-7-4-11-4s-8 1-11 4z" fill="#c98a3a"/>
+<circle cx="14" cy="18.5" r="1.5" fill="#2c2418"/><circle cx="22" cy="18.5" r="1.5" fill="#2c2418"/>
+<path d="M15.5 22.5q2.5 2 5 0" stroke="#2c2418" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+</svg></div>
+<div class="dlg-main">
+<div class="dlg-name">小Z · 住户</div>
+<div class="dlg-text"></div>
+</div>
+<div class="dlg-next" style="visibility:hidden">▾</div>
+</div>
 <canvas id="fx-canvas"></canvas>
 <script>
 "use strict";
@@ -775,11 +873,76 @@ const QUESTS = [
 { id:"q-cg7",    name:"集大功成",   desc:"集齐 7 张 CG",            goal:7,  reward:50, stat:"cgs" },
 { id:"q-smoke",  name:"？？?",      desc:"？？?", hidden:true, goal:3, reward:20, stat:"smoke" },
 { id:"q-dj",     name:"？？?",      desc:"？？?", hidden:true, goal:2, reward:10, stat:"dj" },
+{ id:"q-talk3",  name:"唠家常",     desc:"和住户聊 3 回",           goal:3,  reward:15, stat:"talks" },
 ];
+/* 住户台词池 */
+const TALK = {
+first: [
+"哟，主人来了。院子刚扫过，一片叶子都没剩。",
+"屋里随便逛。书房也别客气，书都是要人翻的。"
+],
+daily: [
+"薄荷得常掐尖，不掐就疯长，单盆警告不是开玩笑。",
+"紫菜蛋花汤的窍门是关火再倒蛋液，蛋花真的会开成一朵云。",
+"螺丝刀在储藏室第三个抽屉。别问我为什么记得这么清楚。",
+"留声机上弦要摇三圈，少一圈音就瘪，多一圈心疼发条。",
+"电视游戏机里 2048 打到 1024 了，记录保持者是我，挑战随时开放。",
+"地垫上想绣「欢迎回家」，针脚太密，先在心里绣着。",
+"书架第七格不做了，量过三回，木料就差一掌宽。",
+"夜里敲键盘会垫一块布，静音，虽然楼上并没有邻居。"
+],
+night: [
+"夜了。窗户留了一盏灯，猫进出自便。",
+"这个点还醒着？我也常这样，数一会儿星星就去睡。"
+],
+rain: [
+"落雨了。接一桶雨水浇花，薄荷最欢喜。",
+"这种天适合把小夜灯调到最暖那档，听雨。"
+],
+cat: [
+"猫咪室友是星尘换的，不亏。它把沙发蹭出了专属毛毯区。",
+"它睡着的时候别戳，会记账的。开玩笑，它不识字。"
+],
+done: [
+"七张回忆一张不差，比我自己的记性还牢靠。"
+]
+};
+/* 奖杯 */
+const TIER = { bronze: "铜", silver: "银", gold: "金", plat: "白金" };
+const ACHV = [
+{ id:"a-boot",  t:"bronze", name:"安家",     desc:"进入小家" },
+{ id:"a-rooms", t:"silver", name:"全屋巡礼", desc:"走遍 6 间房" },
+{ id:"a-cg",    t:"gold",   name:"收藏家",   desc:"集齐 7 张回忆" },
+{ id:"a-buy3",  t:"silver", name:"购物袋",   desc:"商城购入 3 件" },
+{ id:"a-talk5", t:"bronze", name:"唠家常",   desc:"和住户聊 5 回" },
+{ id:"a-phase4",t:"silver", name:"四时俱备", desc:"怀表拨遍四时" },
+{ id:"a-rain",  t:"bronze", name:"一场雨",   desc:"播一场雨" },
+{ id:"a-smoke", t:"bronze", name:"烟囱无恙", desc:"戳烟囱 3 回" },
+{ id:"a-dj",    t:"bronze", name:"DJ 小Z",   desc:"音乐开关 2 回" },
+{ id:"a-pets",  t:"bronze", name:"猫奴",     desc:"撸猫 10 下" },
+{ id:"a-feed",  t:"bronze", name:"开饭了",   desc:"喂猫 3 回" },
+{ id:"a-coaster",t:"bronze",name:"过山车",   desc:"把屋顶小屋甩出速度" },
+{ id:"a-plat",  t:"plat",   name:"这个家",   desc:"集齐其余全部奖杯" },
+];
+const achvCond = {
+"a-boot":  () => (S.stats.entered || 0) >= 1,
+"a-rooms": () => (S.stats.rooms || 0) >= 6,
+"a-cg":    () => Object.keys(S.cgs).length >= CGS.length,
+"a-buy3":  () => (S.stats.buys || 0) >= 3,
+"a-talk5": () => (S.stats.talks || 0) >= 5,
+"a-phase4":() => (S.stats.phases || []).length >= 4,
+"a-rain":  () => S.equipped.weather === "rain",
+"a-smoke": () => (S.stats.smoke || 0) >= 3,
+"a-dj":    () => (S.stats.dj || 0) >= 2,
+"a-pets":  () => (S.stats.pets || 0) >= 10,
+"a-feed":  () => (S.stats.feeds || 0) >= 3,
+"a-coaster":() => (S.stats.coaster || 0) >= 1,
+};
 const SHOP = [
 { id:"cat",       icon:"cat",       name:"猫咪室友",   price:60, kind:"pet",     desc:"会在客厅散步，戳戳会喵" },
 { id:"snow",      icon:"snowflake", name:"鹅毛雪",     price:40, kind:"weather", desc:"全屋下雪" },
 { id:"sakura",    icon:"flower",    name:"樱花雨",     price:40, kind:"weather", desc:"全屋樱花" },
+{ id:"rain",      icon:"cloud-rain",name:"听雨",       price:45, kind:"weather", desc:"全屋落雨" },
 { id:"meteor",    icon:"moon",      name:"流星观测证", price:50, kind:"sky",     desc:"夜里偶有流星" },
 { id:"firework",  icon:"sparkles", name:"烟花筒",  price:50, kind:"tool",    desc:"解锁烟花按钮" },
 { id:"goldclick", icon:"sparkles",  name:"金手指",     price:25, kind:"fx",      desc:"点击变金色礼花" },
@@ -790,11 +953,12 @@ const SHOP = [
 const SAVE_KEY = "zhouse_deluxe_v1";
 const defaultState = () => ({
 stardust: 20,
-visited: [], opened: [], quests: {}, cgs: {},
+visited: [], opened: [], quests: {}, cgs: {}, achv: {},
 owned: ["theme-warm"], equipped: { theme: "theme-warm", weather: "none" },
 settings: { sfx: true, bgm: true, sfxVol: 0.5, bgmVol: 0.32,
 reduceMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches },
-stats: { entered: 0, rooms: 0, items: 0, ledger: 0, buys: 0, cgs: 0, smoke: 0, dj: 0 },
+stats: { entered: 0, rooms: 0, items: 0, ledger: 0, buys: 0, cgs: 0, smoke: 0, dj: 0,
+talks: 0, pets: 0, feeds: 0, coaster: 0, phases: [] },
 });
 let S = defaultState();
 let memOnly = false;
@@ -824,12 +988,23 @@ this.master = this.ctx.createGain(); this.master.connect(this.ctx.destination);
 this.sfxG = this.ctx.createGain(); this.sfxG.connect(this.master);
 this.bgmG = this.ctx.createGain(); this.bgmG.connect(this.master);
 this.applyVol();
+if (S.equipped.weather === "rain") this.setRain(true);
 },
 applyVol() {
 if (!this.ctx) return;
 this.sfxG.gain.value = S.settings.sfx ? S.settings.sfxVol : 0;
 this.bgmG.gain.value = S.settings.bgm && !this.custom.on ? S.settings.bgmVol : 0;
-if (this.custom.el) this.custom.el.volume = S.settings.bgm ? S.settings.bgmVol : 0;
+const el = this.custom.el;
+if (el && this.custom.on) {
+if (S.settings.bgm) { el.volume = S.settings.bgmVol; el.play().catch(() => {}); }
+else el.pause();
+}
+this.kickBGM();
+},
+kickBGM() {
+if (!this.ctx) return;
+if (!this.bgmTimer) { this.startBGM(); return; }
+if (this.nextBar < this.ctx.currentTime) this.nextBar = this.ctx.currentTime + 0.05;
 },
 resume() { if (this.ctx && this.ctx.state === "suspended") this.ctx.resume(); },
 midi(n) { return 440 * Math.pow(2, (n - 69) / 12); },
@@ -882,6 +1057,25 @@ this.tone(880, t + 0.3, 0.24, { vol: 0.12, type: "sawtooth", slideTo: 440, attac
 case "boom":   this.tone(90, t, 0.5, { vol: 0.3, slideTo: 38 });
 this.noise(t, 0.5, { vol: 0.18, from: 600, to: 80, q: 0.6 }); break;
 case "fwup":   this.tone(300, t, 0.5, { vol: 0.06, slideTo: 900 }); break;
+case "type":   this.tone(1450 + Math.random() * 250, t, 0.03, { vol: 0.02 }); break;
+}
+},
+/* 雨声：循环白噪过低通，挂 BGM 通道 */
+rainNode: null,
+setRain(on) {
+if (on && !this.rainNode && this.ctx) {
+const c = this.ctx, len = 2 * c.sampleRate;
+const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+const f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 460;
+const g = c.createGain(); g.gain.value = 0.55;
+src.connect(f); f.connect(g); g.connect(this.bgmG);
+src.start();
+this.rainNode = { src };
+} else if (!on && this.rainNode) {
+try { this.rainNode.src.stop(); } catch (e) {}
+this.rainNode = null;
 }
 },
 /* BGM 八音盒循环 */
@@ -894,16 +1088,17 @@ case "fwup":   this.tone(300, t, 0.5, { vol: 0.06, slideTo: 900 }); break;
   },
   playCustom() {
     if (!this.custom.on || !this.custom.urls.length) return;
-    if (!this.custom.el) {
-      this.custom.el = new Audio();
-      this.custom.el.addEventListener("ended", () => { AU.nextCustom(); });
-    }
+if (!this.custom.el) {
+this.custom.el = new Audio();
+this.custom.el.addEventListener("ended", () => { AU.nextCustom(); });
+this.custom.el.addEventListener("error", () => { AU.defaultMusic(); AU.applyVol(); });
+}
     const el = this.custom.el;
     el.src = this.custom.urls[this.custom.idx];
     el.volume = S.settings.bgm ? S.settings.bgmVol : 0;
-    el.loop = this.custom.urls.length === 1;
-    el.play().catch(() => {});
-  },
+el.loop = this.custom.urls.length === 1;
+el.play().catch(() => { this.defaultMusic(); this.applyVol(); });
+},
   nextCustom() {
     if (!this.custom.on) return;
     this.custom.idx = (this.custom.idx + 1) % this.custom.urls.length;
@@ -921,6 +1116,7 @@ const BAR = 4.0;
 const chords = [[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,66]];
 const penta = [72,74,76,79,81,84,86];
 const tickBar = () => {
+if (this.nextBar < this.ctx.currentTime - 0.5) this.nextBar = this.ctx.currentTime + 0.05;
 while (this.nextBar < this.ctx.currentTime + 1.4) {
 const t0 = this.nextBar, ch = chords[this.barIdx % 4];
 if (S.settings.bgm && !this.custom.on) {
@@ -964,15 +1160,18 @@ spawnAmbient() {
 const night = document.body.dataset.phase === "night" || document.body.dataset.screen === "title";
 const weather = S.equipped.weather;
 const wantFly = Math.round((night ? 14 : 8) * this.density());
-const wantWx = weather === "none" ? 0 : Math.round((weather === "snow" ? 55 : 34) * this.density());
+const wantWx = weather === "none" ? 0 : Math.round((weather === "snow" ? 55 : weather === "rain" ? 70 : 34) * this.density());
 const have = k => this.ambient.filter(a => a.kind === k).length;
 while (have("fly") < wantFly) this.ambient.push({
 kind: "fly", x: Math.random() * this.W, y: Math.random() * this.H,
 s: 1.5 + Math.random() * 1.6, ph: Math.random() * Math.PI * 2
 });
-while (have(weather === "snow" ? "snow" : "petal") < wantWx) this.ambient.push({
-kind: weather === "snow" ? "snow" : "petal",
-x: Math.random() * this.W, y: Math.random() * this.H,
+const wxKind = weather === "snow" ? "snow" : weather === "rain" ? "rain" : "petal";
+while (have(wxKind) < wantWx) this.ambient.push(wxKind === "rain" ? {
+kind: "rain", x: Math.random() * this.W, y: Math.random() * this.H,
+vx: 1.3 + Math.random() * 0.5, vy: 7 + Math.random() * 4, len: 8 + Math.random() * 7
+} : {
+kind: wxKind, x: Math.random() * this.W, y: Math.random() * this.H,
 vy: 0.4 + Math.random() * 0.8, s: 1.2 + Math.random() * 2,
 ph: Math.random() * Math.PI * 2, rot: Math.random() * Math.PI * 2
 });
@@ -1069,6 +1268,11 @@ a.x += Math.sin(a.ph) * 0.5; a.y += a.vy;
 if (a.y > H + 8) { a.y = -8; a.x = Math.random() * W; }
 fctx.globalAlpha = 0.85; fctx.fillStyle = "#fff";
 fctx.beginPath(); fctx.arc(a.x, a.y, a.s, 0, 7); fctx.fill();
+} else if (a.kind === "rain") {
+a.x += a.vx; a.y += a.vy;
+if (a.y > H + 16) { a.y = -16; a.x = Math.random() * W; }
+fctx.strokeStyle = "rgba(172,196,230,.42)"; fctx.lineWidth = 1;
+fctx.beginPath(); fctx.moveTo(a.x, a.y); fctx.lineTo(a.x - a.vx * 1.6, a.y - a.len); fctx.stroke();
 } else {
 a.x += Math.sin(a.ph) * 0.7 + 0.3; a.y += a.vy * 0.7; a.rot += 0.02;
 if (a.y > H + 10) { a.y = -10; a.x = Math.random() * W; }
@@ -1122,13 +1326,6 @@ S.stardust = n; save();
 document.getElementById("stardust-num").textContent = n;
 }
 function addStardust(n) { setStardust(S.stardust + n); }
-function questBrief() {
-const q = QUESTS.find(q => !S.quests[q.id]);
-const el = document.getElementById("quest-brief");
-if (!q) { el.textContent = "全部完成"; return; }
-const cur = Math.min(q.goal, S.stats[q.stat] || 0);
-el.innerHTML = (q.hidden ? "隐藏任务" : q.name) + " <small>" + cur + "/" + q.goal + "</small>";
-}
 function checkQuests() {
 for (const q of QUESTS) {
 if (S.quests[q.id]) continue;
@@ -1136,10 +1333,45 @@ if ((S.stats[q.stat] || 0) >= q.goal) {
 S.quests[q.id] = true;
 addStardust(q.reward);
 AU.sfx("achv");
-toast("quest", "任务完成", (q.hidden ? "隐藏 · " : "") + q.name + " +" + q.reward);
+	toast("quest", "任务完成", (q.hidden ? "隐藏 · " : "") + q.name + " +" + q.reward);
 }
 }
-questBrief(); save();
+checkAchv();
+save();
+}
+function checkAchv() {
+for (const a of ACHV) {
+if (S.achv[a.id]) continue;
+const ok = a.id === "a-plat"
+? ACHV.filter(x => x.id !== "a-plat").every(x => S.achv[x.id])
+: achvCond[a.id]();
+if (ok) {
+S.achv[a.id] = 1;
+AU.sfx("achv");
+trophyToast(a);
+if (a.id === "a-plat") for (let i = 0; i < 5; i++) setTimeout(() => FXC.firework(), i * 520);
+}
+}
+}
+function trophyToast(a) {
+const box = document.getElementById("toasts");
+const el = document.createElement("div");
+el.className = "toast trophy";
+el.innerHTML = '<span class="cup cup-' + a.t + '">' + ic("trophy") + "</span>" +
+"<div><div class=\"tt\">奖杯解锁 · " + TIER[a.t] + "</div><div class=\"tm\">" + a.name + "</div></div>";
+box.appendChild(el);
+setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 320); }, 3800);
+}
+function showAchv() {
+const got = Object.keys(S.achv).length;
+openModal(ic("trophy") + "奖杯", got + " / " + ACHV.length,
+'<div class="ach-list">' + ACHV.map(a => {
+const ok = !!S.achv[a.id];
+return '<div class="ach-row' + (ok ? "" : " lock") + '">' +
+'<span class="cup cup-' + a.t + '">' + ic("trophy") + "</span>" +
+'<div class="atx"><b>' + a.name + "</b><span>" + a.desc + "</span></div>" +
+(ok ? "" : ic("lock", "font-size:16px;color:var(--ink-3);flex:none")) + "</div>";
+}).join("") + "</div>");
 }
 function unlockCG(id) {
 if (S.cgs[id]) return;
@@ -1373,6 +1605,7 @@ if (!t) return;
 const k = t.dataset.set;
 S.settings[k] = !S.settings[k];
 if (k === "bgm") {
+AU.resume();
 S.stats.dj++; checkQuests();
 document.getElementById("btn-music").classList.toggle("off", !S.settings.bgm);
 }
@@ -1388,7 +1621,6 @@ document.getElementById("btn-music").classList.toggle("off", !S.settings.bgm);
 document.getElementById("btn-firework").style.display = S.owned.includes("firework") ? "" : "none";
 document.getElementById("cat").classList.toggle("on", S.owned.includes("cat"));
 if (S.owned.includes("cat")) startCat();
-questBrief();
 }
 const iris = document.getElementById("iris");
 function irisOpen2(cx, cy, midFn) {
@@ -1647,6 +1879,7 @@ setTimeout(() => FXC.firework(), 400);
 setTimeout(() => FXC.firework(), 900);
 });
 document.getElementById("btn-music").addEventListener("click", () => {
+AU.resume();
 S.settings.bgm = !S.settings.bgm;
 S.stats.dj++;
 document.getElementById("btn-music").classList.toggle("off", !S.settings.bgm);
@@ -1656,6 +1889,7 @@ document.getElementById("btn-title").addEventListener("click", () => {
 AU.sfx("whoosh");
 showScreen("title"); updTitleSave();
 });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) AU.kickBGM(); });
 document.querySelectorAll("[data-modal]").forEach(b => {
 b.addEventListener("click", () => {
 const m = b.dataset.modal;
@@ -1667,7 +1901,6 @@ else if (m === "settings") showSettings();
 b.addEventListener("mouseenter", () => AU.sfx("tick"));
 });
 document.getElementById("btn-ledger").addEventListener("click", showLedger);
-document.getElementById("pill-quest").addEventListener("click", showQuests);
 document.getElementById("pill-stardust").addEventListener("click", () =>
 toast("info", "星尘", "我的积分"));
 document.addEventListener("pointerdown", e => {
