@@ -599,7 +599,6 @@ transition-duration: .01s !important;
 <svg class="mark" viewBox="0 0 48 44"><use href="#i-mark"/></svg>
 <div class="title-logo">小Z 的小家</div>
 <div class="title-sub">Deluxe Edition</div>
-<div class="title-motto">只干真活儿，干得不好不收钱</div>
 </div>
 <div class="title-menu">
 <button class="tmenu-item" id="t-start"><svg class="ic"><use href="#i-house"/></svg>进入小家</button>
@@ -811,7 +810,8 @@ try {
 const raw = localStorage.getItem(SAVE_KEY);
 if (raw) { const p = JSON.parse(raw); S = Object.assign(defaultState(), p);
 S.settings = Object.assign(defaultState().settings, p.settings||{});
-S.stats = Object.assign(defaultState().stats, p.stats||{}); }
+S.stats = Object.assign(defaultState().stats, p.stats||{});
+S.opened = (S.opened||[]).map(k => k.replace(/\.py\b/g, "")); }   // 旧档条目名迁移：查账本.py → 查账本
 } catch (e) { memOnly = true; }
 function save() {
 if (memOnly) return;
@@ -1291,6 +1291,7 @@ if (typeof p.stardust !== "number" || !p.stats) throw 0;
 S = Object.assign(defaultState(), p);
 S.settings = Object.assign(defaultState().settings, p.settings || {});
 S.stats = Object.assign(defaultState().stats, p.stats || {});
+S.opened = (S.opened||[]).map(k => k.replace(/\.py\b/g, ""));
 save(); applyTheme(); applySettingsUI(); setStardust(S.stardust); renderRooms();
 AU.applyVol(); closeModal();
 toast("coin", "导入成功", "星尘 " + S.stardust + " · CG " + Object.keys(S.cgs).length + "/" + CGS.length);
