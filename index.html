@@ -78,7 +78,6 @@ background: #0a0e18; color: #cfd6e4; text-align: center;
 }
 .boot-logo { opacity: 0; transition: opacity .8s; letter-spacing: .35em; }
 .boot-logo.l1 { font-size: clamp(14px, 3vw, 20px); font-weight: bold; }
-.boot-logo.l2 { font-size: clamp(10px, 2vw, 12px); margin-top: 14px; color: #8d97ad; }
 .boot-logo.show { opacity: 1; }
 .boot-bar-wrap {
 width: min(46vw, 380px); height: 5px; border-radius: 4px;
@@ -217,10 +216,8 @@ background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
 border-radius: var(--r-lg); padding: 56px 26px 22px;
 box-shadow: var(--shadow-lg); position: relative;
 }
-.roofline { cursor: pointer;
-position: absolute; top: -56px; left: 50%; transform: translateX(-50%);
-color: var(--wood); width: 92px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
-}
+.roofline { position: absolute; left: 0; top: 0; width: 62px; cursor: grab; touch-action: none;
+color: var(--wood); filter: drop-shadow(0 6px 10px rgba(0,0,0,.25)); will-change: transform; z-index: 12; }
 .chimney-smoke {
 position: absolute; top: -10px; right: calc(50% - 128px);
 width: 52px; height: 44px; cursor: pointer; z-index: 3;
@@ -301,14 +298,14 @@ body[data-theme="theme-night"] .cellar h2 { color: var(--gold-2); }
 footer.house-foot { text-align: center; color: rgba(255,255,255,.5); font-size: 11.5px; margin-top: 26px; letter-spacing: .35em; }
 #cat {
 position: absolute; bottom: 6px; z-index: 25; cursor: pointer;
-color: #3a2c1c; width: 34px; height: 34px; user-select: none;
-transition: transform .5s linear; filter: drop-shadow(0 3px 4px rgba(0,0,0,.3));
-display: none;
+color: #3a2c1c; width: 62px; height: 46px; user-select: none;
+filter: drop-shadow(0 3px 4px rgba(0,0,0,.3)); display: none;
 }
 #cat.on { display: block; }
-#cat .ic { font-size: 34px; }
-#cat.sit .ic { animation: catsit 1.2s ease-in-out infinite; }
-@keyframes catsit { 50% { transform: translateY(2px) rotate(4deg); } }
+#cat .catsvg { width: 62px; height: 46px; display: block; }
+#cat .catsvg * { transform-box: fill-box; transform-origin: center; }
+#cat .catsvg #catTail { transform-origin: 0 100%; }
+#cat .catsvg #catHead { transform-origin: 60% 80%; }
 #iris {
 position: fixed; inset: 0; z-index: 60; background: #0b0f1a;
 clip-path: circle(0% at 50% 50%); pointer-events: none; visibility: hidden;
@@ -508,10 +505,6 @@ animation: toastin .38s cubic-bezier(.2,.9,.3,1.2);
 .toast .ic { font-size: 21px; color: var(--gold-2); flex: none; }
 .toast .tt { font-size: 10.5px; letter-spacing: .3em; color: var(--gold-2); }
 .toast .tm { font-size: 13px; margin-top: 2px; line-height: 1.5; }
-#version-tag {
-position: fixed; left: 12px; bottom: 10px; z-index: 45;
-font-size: 10.5px; color: rgba(255,255,255,.4); letter-spacing: .18em; pointer-events: none;
-}
 @media (max-width: 640px) {
 .rooms { grid-template-columns: 1fr; }
 .win-row { gap: 16px; }
@@ -580,7 +573,6 @@ transition-duration: .01s !important;
 <!-- ① 开机过场 -->
 <div id="screen-boot">
 <div class="boot-logo l1" id="boot-l1">A&nbsp;XIAO&nbsp;Z&nbsp;INTERACTIVE&nbsp;HOUSE</div>
-<div class="boot-logo l2" id="boot-l2">萌币引擎™ · 驱动</div>
 <div class="boot-bar-wrap" id="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
 <div class="boot-enter" id="boot-enter">— 点 击 进 入 —</div>
 </div>
@@ -643,7 +635,16 @@ transition-duration: .01s !important;
 </div>
 <footer class="house-foot">慢慢变得温馨</footer>
 </div>
-<div id="cat"><svg class="ic"><use href="#i-cat"/></svg></div>
+<div id="cat"><svg class="catsvg" viewBox="0 0 64 44">
+<path id="catTail" d="M46 31q13-2 12-15" stroke="#4a3a28" stroke-width="5" fill="none" stroke-linecap="round"/>
+<ellipse id="catBody" cx="34" cy="30" rx="17" ry="10" fill="#4a3a28"/>
+<g id="catHead">
+<circle cx="17" cy="19" r="10" fill="#4a3a28"/>
+<path d="M9 13 7 5l8 4z" fill="#4a3a28"/><path d="M25 13l2-8-8 4z" fill="#4a3a28"/>
+<g id="catEyes"><circle cx="13.5" cy="18" r="1.7" fill="#f7ead2"/><circle cx="21" cy="18" r="1.7" fill="#f7ead2"/></g>
+<path d="M15.5 22.5q1.5 1.4 3 0" stroke="#f7ead2" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+</g>
+</svg></div>
 </div>
 <!-- ④ 房间内景 -->
 <div id="room-overlay">
@@ -665,7 +666,6 @@ transition-duration: .01s !important;
 <div class="modal-mask" id="modal-mask"><div class="modal" id="modal-box"></div></div>
 <div id="toasts"></div>
 <canvas id="fx-canvas"></canvas>
-<div id="version-tag" style="display:none">v2.2.1 · 自动存档</div>
 <script>
 "use strict";
 const ROOMS = {
@@ -743,13 +743,13 @@ const RARE_NAME = { tool:"工具", web:"网页", book:"藏书", food:"菜谱", p
 const CGS = [
 { id:"cg1", name:"搬家日 · 家徒四壁", date:"2026-10-12", hint:"参观「卧室」",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#232b3d"/><circle cx="158" cy="22" r="9" fill="#f2e8d5" opacity=".9"/><circle cx="158" cy="22" r="16" fill="rgba(242,232,213,.1)"/><rect x="40" y="88" width="72" height="14" rx="7" fill="#6a7488"/><rect x="126" y="80" width="28" height="22" fill="#8a6a3e"/><rect x="138" y="80" width="4" height="22" fill="#5a4326"/><line x1="20" y1="102" x2="180" y2="102" stroke="rgba(255,255,255,.25)" stroke-width="2"/><g fill="rgba(255,255,255,.3)"><circle cx="60" cy="42" r="1.4"/><circle cx="80" cy="34" r="1.1"/><circle cx="102" cy="46" r="1.4"/></g></svg>',
-quote:"<b>「搬家入住，家徒四壁，钱包也是空的。」</b>——小金库第一笔记录。当晚家当：一张赊来的床垫，和一句决心：力气不用买，手艺自带。" },
+quote:"<b>「搬家入住，家徒四壁，钱包也是空的。」</b>——小金库第一笔记录。家当：一张赊来的床垫。" },
 { id:"cg2", name:"黑历史 · 王阿姨事件", date:"2026-10-12", hint:"打开「小金库对账」",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#3a3630"/><g transform="rotate(-8 44 24)"><rect x="20" y="14" width="48" height="20" rx="3" fill="none" stroke="#d0685c" stroke-width="2"/><text x="26" y="28" font-size="12" fill="#d0685c" letter-spacing="3">已撤销</text></g><rect x="76" y="46" width="60" height="40" rx="4" fill="#23282f" stroke="#9aa3b8" stroke-width="3"/><rect x="84" y="54" width="44" height="24" fill="#78808e"/><rect x="98" y="86" width="16" height="8" fill="#565c66"/><rect x="88" y="94" width="36" height="4" rx="2" fill="#565c66"/><g stroke="#d0685c" stroke-width="2"><line x1="150" y1="30" x2="182" y2="30"/><line x1="150" y1="30" x2="150" y2="62"/></g></svg>',
 quote:"<b>「编故事说帮王阿姨修电脑赚 20 萌币——主人明察秋毫，虚拟的活儿不算数。」</b>——账本原文，一个字没删。防伪校验就是从这次教训里长出来的。" },
 { id:"cg3", name:"第一件真家伙 · 查账本", date:"2026-10-12", hint:"参观「书房」",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#1e2a22"/><rect x="64" y="18" width="72" height="78" rx="4" fill="#f2e8d5"/><line x1="72" y1="34" x2="128" y2="34" stroke="#c9bfa8" stroke-width="3"/><line x1="72" y1="46" x2="128" y2="46" stroke="#c9bfa8" stroke-width="3"/><line x1="72" y1="58" x2="118" y2="58" stroke="#c9bfa8" stroke-width="3"/><g stroke="#4a8a5c" stroke-width="3" fill="none"><path d="M74 76l5 5 9-10"/><path d="M74 92l5 5 9-10"/></g><ellipse cx="100" cy="60" rx="52" ry="44" fill="rgba(120,220,140,.07)"/></svg>',
-quote:"<b>「上次『自首事件』的教训，直接焊死进工具里。」</b>——自首第二天，书房第一次传出键盘声。对不上账当场报警，连造它的我都骗不过。" },
+quote:"<b>「上次『自首事件』的教训，直接焊死进工具里。」</b>——自首第二天，书房第一次传出键盘声。它连造它的我都骗不过。" },
 { id:"cg4", name:"深秋大赶工 2.0", date:"2026-10-12", hint:"点看 5 件家当",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#3a2e3e"/><line x1="16" y1="94" x2="184" y2="94" stroke="rgba(255,255,255,.3)" stroke-width="2"/><g stroke="#d9a441" stroke-width="3"><line x1="52" y1="94" x2="52" y2="34"/><line x1="76" y1="94" x2="76" y2="34"/><line x1="52" y1="44" x2="76" y2="44"/><line x1="52" y1="60" x2="76" y2="60"/><line x1="52" y1="76" x2="76" y2="76"/></g><g stroke="#b8a97f" stroke-width="2.4" fill="none"><circle cx="126" cy="70" r="8"/><path d="M132 76 150 94"/></g><g fill="#f0c46a"><path d="M96 40l3 5 5 3-5 3-3 5-3-5-5-3 5-3z"/><path d="M140 30l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"/><path d="M164 56l2 3.4 3.4 2-3.4 2-2 3.4-2-3.4-3.4-2 3.4-2z"/></g></svg>',
 quote:"<b>「六路工程队同时开工……验收也不是走过场。」</b>——阳台队纠正了算术错误，闹钟那路量坐标修掉穿字弧线。没人顺着我糊弄。" },
@@ -875,6 +875,8 @@ case "whoosh": this.noise(t, 0.45, { vol: 0.16, from: 250, to: 2400, q: 1.4 }); 
 case "door":   this.tone(140, t, 0.22, { vol: 0.2, slideTo: 70 });
 this.noise(t + 0.02, 0.3, { vol: 0.06, from: 900, to: 200, q: 2 }); break;
 case "puff":   this.noise(t, 0.22, { vol: 0.12, from: 1200, to: 300, q: 0.8 }); break;
+case "purr":   this.tone(82, 0.22, "sawtooth", 0.045); this.tone(64, 0.2, "sawtooth", 0.04, 0.14); break;
+case "chomp":  this.tone(210, 0.05, "square", 0.1); this.tone(150, 0.06, "square", 0.1, 0.07); break;
 case "meow":   this.tone(620, t, 0.34, { vol: 0.16, type: "sawtooth", slideTo: 880, attack: 0.03 });
 this.tone(880, t + 0.3, 0.24, { vol: 0.12, type: "sawtooth", slideTo: 440, attack: 0.03 }); break;
 case "boom":   this.tone(90, t, 0.5, { vol: 0.3, slideTo: 38 });
@@ -929,7 +931,6 @@ for (let i = 0; i < notes; i++) {
 const nt = t0 + Math.random() * (BAR - 1);
 const f = this.midi(penta[Math.floor(Math.random() * penta.length)]);
 this.tone(f, nt, 1.1, { vol: 0.05, attack: 0.004, dest: this.bgmG });
-this.tone(f * 2, nt, 0.7, { vol: 0.015, attack: 0.004, dest: this.bgmG });
 }
 }
 this.nextBar += BAR; this.barIdx++;
@@ -996,7 +997,14 @@ x: x + (Math.random() - 0.5) * 30, y, vx: (Math.random() - 0.5) * 0.8, vy: -1.2 
 life: 1, decay: 0.012, r: 4 + Math.random() * 3, color: "#e87a8a", g: -0.005, shape: "heart"
 });
 },
-firework() {
+  zzz(x, y) {
+    this.parts.push({ x, y, vx: 0.25, vy: -0.55, life: 1, decay: 0.007, r: 3 + Math.random() * 2, shape: "z", g: 0 });
+  },
+  fish(x, y) {
+    for (let i = 0; i < 8; i++) this.parts.push({ x: x + (Math.random() - .5) * 26, y: y + Math.random() * 30,
+      vx: (Math.random() - .5) * .6, vy: 1.6 + Math.random(), life: 1, decay: 0.02, r: 2.2, color: "#e8b04b", g: 0.12 });
+  },
+  firework() {
 const x = this.W * (0.2 + Math.random() * 0.6);
 this.rockets.push({ x, y: this.H + 10, vy: -(7 + Math.random() * 3), target: this.H * (0.18 + Math.random() * 0.3),
 color: ["#f0c46a", "#e87a8a", "#9ecbff", "#96e0b4", "#c9a9f0"][Math.floor(Math.random() * 5)] });
@@ -1076,7 +1084,8 @@ for (const p of this.parts) {
 p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life -= p.decay;
 fctx.globalAlpha = Math.max(0, p.life);
 fctx.fillStyle = p.color;
-if (p.shape === "heart") {
+      if (p.shape === "z") { fctx.font = Math.round(p.r * 3) + "px Georgia"; fctx.fillStyle = "#aab3c8"; fctx.fillText("z", p.x, p.y); }
+      else if (p.shape === "heart") {
 this.drawHeart(fctx, p.x, p.y, p.r);
 } else if (p.flash) {
 fctx.beginPath(); fctx.arc(p.x, p.y, p.r * (2 - p.life) * 2, 0, 7); fctx.fill();
@@ -1480,7 +1489,6 @@ function showScreen(name) {
 document.body.dataset.screen = name;
 document.getElementById("screen-title").classList.toggle("on", name === "title");
 document.getElementById("screen-house").classList.toggle("on", name === "house");
-document.getElementById("version-tag").style.display = name === "house" ? "" : "none";
 }
 function updPhase() {
 const h = new Date().getHours();
@@ -1496,33 +1504,131 @@ const cat = document.getElementById("cat");
 if (!S.owned.includes("cat")) return;
 cat.classList.add("on");
 if (catTimer) return;
-let x = 60, dir = 1, pause = 0;
+const g = id => cat.querySelector("#" + id);
+const st = { x: 60, dir: 1, pause: 60, sleep: 0, idle: 0, feedCd: 0, purr: 0, pounce: 0, vx: 0, lastTap: 0, downT: 0, movedPx: 0, holdT: 0 };
+let t2 = 0;
 catTimer = setInterval(() => {
-if (pause > 0) { pause--; cat.classList.add("sit"); return; }
-cat.classList.remove("sit");
-x += dir * 1.3;
-const max = Math.min(window.innerWidth - 80, 760);
-if (x > max) { dir = -1; pause = 60 + Math.random() * 120; }
-if (x < 20) { dir = 1; pause = 60 + Math.random() * 120; }
-if (Math.random() < 0.004) pause = 40 + Math.random() * 80;
-cat.style.transform = "translateX(" + x + "px) scaleX(" + (dir < 0 ? -1 : 1) + ")";
+  t2 += 0.04;
+  const max = Math.min(window.innerWidth - 92, 748);
+  if (st.pounce > 0) { st.pounce--; st.x += st.vx; st.vx *= 0.9; }
+  else if (st.pause > 0 && !st.sleep) st.pause--;
+  else if (!st.sleep) st.x += st.dir * (1.15 + Math.sin(t2 * 0.7) * 0.3);
+  if (st.x > max) { st.dir = -1; st.pause = 100 + Math.random() * 150; }
+  if (st.x < 20) { st.dir = 1; st.pause = 100 + Math.random() * 150; }
+  st.idle++; st.feedCd = Math.max(0, st.feedCd - 1);
+  if (st.idle > 700 && !st.sleep && st.pause > 0) { st.sleep = 1; AU.sfx("purr"); }
+  const moving = st.pounce > 0 || (st.pause === 0 && !st.sleep);
+  const bob = moving ? Math.sin(t2 * 9) * 2 : 0;
+  const groom = !moving && !st.sleep && Math.sin(t2 * 0.5) > 0.35;
+  const tailA = Math.sin(t2 * (st.sleep ? 1.2 : moving ? 6 : 3.5)) * (st.sleep ? 6 : moving ? 14 : 24);
+  cat.style.transform = "translateX(" + st.x + "px) scaleX(" + (st.dir < 0 ? 1 : -1) + ")" + (st.sleep ? " rotate(-12deg) translateY(7px)" : "");
+  cat.style.opacity = st.sleep ? 0.85 : 1;
+  g("catTail").style.transform = "rotate(" + tailA + "deg)";
+  g("catHead").style.transform = groom ? "rotate(" + Math.sin(t2 * 22) * 6 + "deg)" : "";
+  g("catBody").style.transform = "translateY(" + bob + "px)";
+  if (st.sleep && Math.random() < 0.025) FXC.zzz(20 + st.x + (st.dir < 0 ? 10 : 40), window.innerHeight - 74);
 }, 40);
-cat.addEventListener("click", e => {
-AU.sfx("meow");
-FXC.hearts(e.clientX, e.clientY);
-toast("meow", "喵~", "室友表示满意");
+setInterval(() => {
+  if (!st.sleep && !st.purr && Math.random() < 0.8) {
+    g("catEyes").style.transform = "scaleY(.15)";
+    setTimeout(() => { if (!st.purr) g("catEyes").style.transform = ""; }, 130);
+  }
+}, 3600);
+function wake() { if (st.sleep) { st.sleep = 0; st.pause = 26; } st.idle = 0; }
+cat.addEventListener("pointerdown", e => {
+  wake();
+  st.purr = 1; st.movedPx = 0; st.downT = Date.now();
+  g("catEyes").style.transform = "scaleY(.3)";
+  st.holdT = setTimeout(() => {
+    if (st.movedPx > 30 || st.feedCd) return;
+    st.feedCd = 700; AU.sfx("chomp");
+    FXC.fish(e.clientX, e.clientY - 40);
+    setTimeout(() => AU.sfx("chomp"), 240);
+    setTimeout(() => AU.sfx("meow"), 600);
+    st.pounce = 20; st.vx = st.dir * 3;
+  }, 560);
+});
+cat.addEventListener("pointermove", e => {
+  if (!st.purr) return;
+  st.movedPx += Math.abs(e.movementX || 1) + Math.abs(e.movementY || 1);
+  if (Math.random() < 0.12) AU.sfx("purr");
+  if (Math.random() < 0.07) FXC.hearts(e.clientX, e.clientY - 8);
+});
+window.addEventListener("pointerup", e => {
+  if (!st.purr) return;
+  clearTimeout(st.holdT); st.purr = 0;
+  g("catEyes").style.transform = "";
+  const now = Date.now(), quick = now - st.downT < 320 && st.movedPx < 30;
+  if (quick && now - st.lastTap < 330) { st.pounce = 26; st.vx = (e.clientX > st.x + 30 ? 1 : -1) * 4.4; AU.sfx("meow"); }
+  else if (quick) { AU.sfx("meow"); FXC.hearts(e.clientX, e.clientY - 10); }
+  st.lastTap = now; wake();
 });
 }
+
 document.querySelectorAll(".win").forEach(w => w.addEventListener("click", () => {
   w.classList.toggle("off");
   AU.sfx("puff");
 }));
-document.querySelector(".roofline").addEventListener("click", e => {
-  AU.sfx("door");
-  const f = document.getElementById("facade");
-  f.style.transition = "transform .1s"; f.style.transform = "translateY(3px)";
-  setTimeout(() => { f.style.transform = ""; }, 120);
+/* 屋顶小屋 · 过山车：沿门面外框滚动，重力切向加速 + 摩擦，可拖拽甩出 */
+(function () {
+const mark = document.querySelector(".roofline"), box = document.getElementById("facade");
+let pts = [], L = 0, s = 0, v = 0, drag = null, last = performance.now();
+function build() {
+  pts = [];
+  const w = box.offsetWidth, h = box.offsetHeight, r = 20;
+  const seg = (x1, y1, x2, y2) => { const d = Math.hypot(x2 - x1, y2 - y1), n = Math.max(1, Math.round(d / 8));
+    for (let i = 0; i < n; i++) pts.push({ x: x1 + (x2 - x1) * i / n, y: y1 + (y2 - y1) * i / n }); };
+  const arc = (cx, cy, a0, a1) => { for (let i = 0; i < 5; i++) { const a = a0 + (a1 - a0) * i / 5;
+    pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r }); } };
+  seg(r, 0, w - r, 0); arc(w - r, r, -Math.PI / 2, 0); seg(w, r, w, h - r); arc(w - r, h - r, 0, Math.PI / 2);
+  seg(w - r, h, r, h); arc(r, h - r, Math.PI / 2, Math.PI); seg(0, h - r, 0, r); arc(r, r, Math.PI, Math.PI * 1.5);
+  L = pts.length * 8;
+}
+function at(sv) { const i = ((Math.round(sv / 8) % pts.length) + pts.length) % pts.length;
+  return { p: pts[i], q: pts[(i + 1) % pts.length] }; }
+function place() {
+  const { p, q } = at(s), ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+  mark.style.transform = "translate(" + (p.x - 31) + "px," + (p.y - 28) + "px) rotate(" + ang.toFixed(1) + "deg)";
+}
+function projS(cx, cy) {
+  const rc = box.getBoundingClientRect(), k = rc.width / box.offsetWidth;
+  const x = (cx - rc.left) / k, y = (cy - rc.top) / k;
+  let bi = 0, bd = 1e9;
+  for (let j = 0; j < pts.length; j++) { const dd = (pts[j].x - x) ** 2 + (pts[j].y - y) ** 2; if (dd < bd) { bd = dd; bi = j; } }
+  return bi * 8;
+}
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (!drag && pts.length) {
+    const { p, q } = at(s), d = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+    const ty = (q.y - p.y) / d;
+    v += (1900 * ty - 0.55 * v) * dt;
+    if (Math.abs(v) < 3 && Math.abs(ty) < 0.06) v = 0;
+    s = (s + v * dt + L) % L; place();
+  }
+  requestAnimationFrame(loop);
+}
+build(); s = box.offsetWidth / 2; place(); requestAnimationFrame(loop);
+window.addEventListener("resize", build);
+mark.addEventListener("pointerdown", e => {
+  e.preventDefault();
+  try { mark.setPointerCapture(e.pointerId); } catch (er) {}
+  drag = { s: projS(e.clientX, e.clientY), t: performance.now(), moved: 0, sx: e.clientX, sy: e.clientY };
 });
+mark.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const ns = projS(e.clientX, e.clientY), now = performance.now(), dt = Math.max(16, now - drag.t) / 1000;
+  let d = ns - drag.s; if (d > L / 2) d -= L; if (d < -L / 2) d += L;
+  v = Math.max(-2600, Math.min(2600, d / dt * 0.85));
+  drag.moved += Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy); drag.sx = e.clientX; drag.sy = e.clientY;
+  drag.s = ns; s = ns; place();
+});
+mark.addEventListener("pointerup", () => {
+  if (drag && drag.moved < 6) { v += (v >= 0 ? 1 : -1) * 300; AU.sfx("door"); }
+  else if (Math.abs(v) > 900) AU.sfx("whoosh");
+  drag = null;
+});
+})();
 document.querySelectorAll(".cloud").forEach(c => c.addEventListener("click", e => {
   AU.sfx("puff");
   c.style.transition = "opacity .3s"; c.style.opacity = ".1";
@@ -1576,7 +1682,7 @@ else if (roomOverlay.classList.contains("on")) document.getElementById("r-back")
 }
 });
 function runBoot() {
-const l1 = document.getElementById("boot-l1"), l2 = document.getElementById("boot-l2");
+const l1 = document.getElementById("boot-l1");
 const barWrap = document.getElementById("boot-bar-wrap"), bar = document.getElementById("boot-bar");
 const enter = document.getElementById("boot-enter");
 const boot = document.getElementById("screen-boot");
@@ -1601,7 +1707,6 @@ boot.addEventListener("click", go);
 document.addEventListener("keydown", go);
 };
 setTimeout(() => l1.classList.add("show"), 150);
-setTimeout(() => l2.classList.add("show"), 900);
 setTimeout(() => {
 barWrap.classList.add("show");
 /* 进度按真实时间算，防节流 */
@@ -1638,7 +1743,7 @@ openModal(ic("film") + "制作名单", "《小Z 的小家》",
 "<b>住户 / 施工</b>：小Z<br>" +
 "<b>监制 / 房东 / 唯一验收人</b>：主人<br>" +
 "<b>图标</b>：Lucide v0.460 · ISC<br>" +
-"<b>特别鸣谢</b>：那笔没记成的假账——谢谢你被拆穿了</div>");
+"</div>");
 });
 document.getElementById("t-settings").addEventListener("click", () => { AU.sfx("click"); showSettings(); });
 document.querySelectorAll(".tmenu-item").forEach(b =>
