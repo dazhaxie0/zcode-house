@@ -90,8 +90,6 @@ height: 100%; width: 0%; border-radius: 4px;
 background: linear-gradient(90deg, #d4880f, #f0c46a);
 box-shadow: 0 0 12px rgba(240,196,106,.7);
 }
-.boot-tip { margin-top: 18px; font-size: 12px; color: #7d879e; min-height: 18px; opacity: 0; transition: opacity .4s; }
-.boot-tip.show { opacity: 1; }
 .boot-enter {
 margin-top: 42px; opacity: 0; transition: opacity .5s; pointer-events: none;
 font-size: 14px; letter-spacing: .6em; color: #f0c46a; animation: breathe 1.8s ease-in-out infinite;
@@ -155,7 +153,7 @@ display: flex; justify-content: space-between; padding: 0 18px;
 font-size: 11px; color: rgba(255,255,255,.4); letter-spacing: .1em;
 }
 #screen-house { padding: 0 0 60px; }
-.cloud {
+.cloud { cursor: pointer;
 position: fixed; width: 96px; height: 26px; border-radius: 20px;
 background: rgba(255,255,255,.3); z-index: 1; pointer-events: none;
 animation: drift linear infinite;
@@ -219,7 +217,7 @@ background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
 border-radius: var(--r-lg); padding: 56px 26px 22px;
 box-shadow: var(--shadow-lg); position: relative;
 }
-.roofline {
+.roofline { cursor: pointer;
 position: absolute; top: -56px; left: 50%; transform: translateX(-50%);
 color: var(--wood); width: 92px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
 }
@@ -240,7 +238,7 @@ filter: blur(2px); opacity: 0; animation: puff 4s ease-out infinite;
 100% { opacity: 0; transform: translate(-40%, -52px) scale(2); }
 }
 .win-row { display: flex; justify-content: center; gap: 26px; margin: -42px 0 12px; position: relative; z-index: 2; }
-.win {
+.win { cursor: pointer;
 width: 32px; height: 38px; border-radius: 6px 6px 10px 10px;
 background: linear-gradient(180deg, #7fb2d9, #a8cbe4);
 border: 3px solid var(--wood-2); position: relative; overflow: hidden;
@@ -254,6 +252,8 @@ background: radial-gradient(circle at 50% 60%, #ffd98a, #d9962e);
 box-shadow: 0 0 18px rgba(255,200,100,.55);
 }
 body[data-phase="night"] .win.flicker { animation: winflick 7s steps(1) infinite; }
+body[data-phase="night"] .win.off { background: #2c3550; box-shadow: none; }
+.win.off { filter: brightness(.55) saturate(.4); }
 @keyframes winflick { 88%, 92% { box-shadow: 0 0 4px rgba(255,200,100,.2); } }
 .rooms { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 6px; }
 .room {
@@ -286,11 +286,6 @@ body[data-theme="theme-night"] .room h2 { color: var(--gold-2); }
 .room .plate {
 position: absolute; top: 9px; right: 30px; font-size: 9.5px; letter-spacing: .15em;
 color: var(--ink-3); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px;
-}
-.room.visited::after {
-content: ""; position: absolute; bottom: 10px; right: 12px; width: 7px; height: 7px;
-border-radius: 50%; background: var(--ok);
-box-shadow: 0 0 6px color-mix(in srgb, var(--ok) 60%, transparent);
 }
 .cellar {
 margin-top: 13px; background: var(--paper-2);
@@ -347,6 +342,8 @@ overflow: hidden; border: 1px solid rgba(255,255,255,.1);
 box-shadow: inset 0 0 60px rgba(0,0,0,.5);
 }
 .scene > svg.art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.scene .hot { cursor: pointer; }
+.scene .hot:hover { filter: brightness(1.18); }
 .scene.living  { background: linear-gradient(180deg, #4a3524, #2a1d12); }
 .scene.bedroom { background: linear-gradient(180deg, #141a2e, #0c101f); }
 .scene.study   { background: linear-gradient(180deg, #33291c, #1e160e); }
@@ -387,10 +384,6 @@ display: flex; align-items: center; justify-content: center;
 }
 .inv-slot .in { font-size: 12.5px; margin-top: 8px; color: #e9e6da; letter-spacing: .05em; }
 .inv-slot .rare { position: absolute; top: 7px; right: 8px; font-size: 9px; padding: 2px 6px; border-radius: 99px; letter-spacing: .1em; }
-.inv-slot.seen::after {
-content: ""; position: absolute; bottom: 9px; right: 9px; width: 6px; height: 6px;
-border-radius: 50%; background: #7fae8f;
-}
 .r-tool  { background: rgba(90,140,200,.18); color: #8fb8e8; border: 1px solid rgba(90,140,200,.4); }
 .r-web   { background: rgba(170,120,220,.18); color: #c9a9f0; border: 1px solid rgba(170,120,220,.4); }
 .r-book  { background: rgba(110,180,110,.18); color: #9ed49e; border: 1px solid rgba(110,180,110,.4); }
@@ -589,7 +582,6 @@ transition-duration: .01s !important;
 <div class="boot-logo l1" id="boot-l1">A&nbsp;XIAO&nbsp;Z&nbsp;INTERACTIVE&nbsp;HOUSE</div>
 <div class="boot-logo l2" id="boot-l2">萌币引擎™ · 驱动</div>
 <div class="boot-bar-wrap" id="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
-<div class="boot-tip" id="boot-tip"></div>
 <div class="boot-enter" id="boot-enter">— 点 击 进 入 —</div>
 </div>
 <!-- ② 标题画面 -->
@@ -616,7 +608,7 @@ transition-duration: .01s !important;
 <div class="cloud c2"></div>
 <div class="cloud c3"></div>
 <div class="hud">
-<span class="pill" id="pill-stardust" title="娱乐积分 · 非萌币"><svg class="ic"><use href="#i-sparkles"/></svg><b id="stardust-num">0</b></span>
+<span class="pill" id="pill-stardust"><svg class="ic"><use href="#i-sparkles"/></svg><b id="stardust-num">0</b></span>
 <span class="pill quest" id="pill-quest"><svg class="ic"><use href="#i-list-todo"/></svg><span id="quest-brief">…</span></span>
 <span class="spacer"></span>
 <button class="ico-btn" id="btn-ledger" data-tip="小金库"><svg class="ic"><use href="#i-coins"/></svg></button>
@@ -739,12 +731,12 @@ note:"每日花签 + 按档案算浇水日 · 阳台/今日花开.py" },
 };
 /* 手绘布景 */
 const SC = {
-living:'<svg class="art" viewBox="0 0 320 130"><ellipse cx="160" cy="118" rx="118" ry="9" fill="rgba(217,164,65,.12)"/><rect x="0" y="112" width="320" height="18" fill="rgba(0,0,0,.28)"/><g><rect x="88" y="62" width="116" height="36" rx="10" fill="#a06a38"/><rect x="82" y="48" width="128" height="24" rx="10" fill="#8a5a2e"/><rect x="96" y="66" width="48" height="24" rx="7" fill="#b57a42"/><rect x="150" y="66" width="48" height="24" rx="7" fill="#b57a42"/><rect x="94" y="96" width="6" height="14" fill="#3a2c1c"/><rect x="192" y="96" width="6" height="14" fill="#3a2c1c"/></g><g><rect x="250" y="52" width="3" height="58" fill="#3a2c1c"/><path d="M238 32h28l-5 22h-18z" fill="#d9a441"/><circle cx="251" cy="52" r="30" fill="rgba(255,200,100,.13)"/></g><g><rect x="26" y="56" width="52" height="38" rx="5" fill="#101820" stroke="#3a2c1c" stroke-width="3"/><rect class="flick" x="31" y="61" width="42" height="28" rx="3" fill="rgba(122,148,184,.45)"/><rect x="46" y="94" width="12" height="6" fill="#3a2c1c"/><rect x="34" y="100" width="36" height="4" rx="2" fill="#241a10"/></g><g class="spin"><circle cx="222" cy="107" r="8.5" fill="#1c1610" stroke="#d9a441" stroke-width="2"/><circle cx="222" cy="107" r="2.4" fill="#d9a441"/></g></svg>',
-bedroom:'<svg class="art" viewBox="0 0 320 130"><rect x="222" y="16" width="58" height="66" rx="6" fill="#24304e" stroke="#3a4358" stroke-width="3"/><line x1="251" y1="16" x2="251" y2="82" stroke="#3a4358" stroke-width="3"/><line x1="222" y1="49" x2="280" y2="49" stroke="#3a4358" stroke-width="3"/><circle cx="238" cy="34" r="8" fill="#f2e8d5" opacity=".9"/><circle cx="238" cy="34" r="15" fill="rgba(242,232,213,.12)"/><circle cx="290" cy="26" r="5" fill="#f2e8d5" opacity=".7"/><rect x="30" y="88" width="126" height="20" rx="6" fill="#3a4258"/><rect x="35" y="76" width="116" height="15" rx="7" fill="#5a6480"/><rect x="42" y="67" width="28" height="13" rx="6" fill="#c8cede"/><rect x="0" y="106" width="320" height="24" fill="rgba(0,0,0,.3)"/><circle class="nlg" cx="186" cy="98" r="15" fill="rgba(255,214,140,.22)"/><circle cx="186" cy="98" r="4" fill="#ffd68c"/><g stroke="#aab3c8" stroke-width="2" fill="none" stroke-linecap="round"><circle cx="120" cy="30" r="10"/><path d="M120 24v6l4 3"/></g><g fill="#8d97ad"><circle class="zf" cx="168" cy="66" r="2"/><circle class="zf z2" cx="176" cy="58" r="1.6"/></g></svg>',
-study:'<svg class="art" viewBox="0 0 320 130"><rect x="18" y="14" width="152" height="76" rx="4" fill="#241a10" stroke="#4a3a28" stroke-width="5"/><line x1="18" y1="40" x2="170" y2="40" stroke="#4a3a28" stroke-width="4"/><line x1="18" y1="65" x2="170" y2="65" stroke="#4a3a28" stroke-width="4"/><g><rect x="26" y="24" width="9" height="16" fill="#8a5a2e"/><rect x="37" y="28" width="9" height="12" fill="#b57a42"/><rect x="48" y="22" width="10" height="18" fill="#6a7488"/><rect x="60" y="27" width="9" height="13" fill="#7a94b8"/><rect x="71" y="24" width="9" height="16" fill="#4a8a5c"/><rect x="82" y="29" width="10" height="11" fill="#b57a42"/><rect x="94" y="25" width="9" height="15" fill="#8a5a2e"/><rect x="26" y="49" width="10" height="16" fill="#7a94b8"/><rect x="38" y="53" width="9" height="12" fill="#8a5a2e"/><rect x="49" y="48" width="9" height="17" fill="#b57a42"/><rect x="60" y="52" width="10" height="13" fill="#6a7488"/><rect x="72" y="49" width="9" height="16" fill="#b57a42"/><rect x="83" y="54" width="9" height="11" fill="#4a8a5c"/></g><g><rect x="196" y="80" width="100" height="7" rx="2" fill="#3a2c1c"/><rect x="200" y="87" width="7" height="23" fill="#3a2c1c"/><rect x="285" y="87" width="7" height="23" fill="#3a2c1c"/><rect x="220" y="48" width="48" height="30" rx="4" fill="#101820" stroke="#4a3a28" stroke-width="3"/><rect class="flick" x="224" y="52" width="40" height="22" rx="2" fill="rgba(122,148,184,.4)"/><path d="M282 84 268 50" stroke="#3a2c1c" stroke-width="3"/><path d="M270 46 284 40l8 14-14 6z" fill="#d9a441"/><path d="M284 44 316 116 252 116z" fill="rgba(255,214,140,.07)"/></g><g fill="#9ecbff" opacity=".8"><circle class="zf" cx="180" cy="70" r="1.8"/><circle class="zf z2" cx="172" cy="55" r="1.4"/></g><rect x="0" y="112" width="320" height="18" fill="rgba(0,0,0,.3)"/></svg>',
-kitchen:'<svg class="art" viewBox="0 0 320 130"><line x1="66" y1="0" x2="66" y2="26" stroke="#3a2c1c" stroke-width="3"/><path d="M50 26h32l-6 18H56z" fill="#d9a441"/><ellipse cx="66" cy="52" rx="34" ry="10" fill="rgba(255,214,140,.12)"/><rect x="22" y="92" width="132" height="8" rx="2" fill="#241a10"/><rect x="28" y="100" width="52" height="26" fill="#332014"/><rect x="96" y="100" width="52" height="26" fill="#332014"/><line x1="54" y1="100" x2="54" y2="126" stroke="#241a10" stroke-width="3"/><line x1="122" y1="100" x2="122" y2="126" stroke="#241a10" stroke-width="3"/><g><path d="M42 76h40v8a20 20 0 0 1-40 0z" fill="#5a6480"/><rect x="36" y="77" width="7" height="4" rx="2" fill="#5a6480"/><rect x="81" y="77" width="7" height="4" rx="2" fill="#5a6480"/><path class="steam" d="M54 70q4-8 0-16" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/><path class="steam s2" d="M68 70q-4-8 0-16" stroke="rgba(255,255,255,.4)" stroke-width="2" fill="none" stroke-linecap="round"/></g><g><rect x="196" y="66" width="70" height="34" rx="6" fill="#8a5a2e"/><line x1="196" y1="76" x2="266" y2="76" stroke="#6a4a24" stroke-width="2"/><rect x="206" y="84" width="22" height="3" rx="1.5" fill="#f2e8d5" opacity=".7"/><rect x="206" y="91" width="34" height="3" rx="1.5" fill="#f2e8d5" opacity=".4"/></g><rect x="0" y="112" width="320" height="18" fill="rgba(0,0,0,.3)"/></svg>',
-balcony:'<svg class="art" viewBox="0 0 320 130"><circle cx="46" cy="26" r="13" fill="#f5d68a"/><circle cx="46" cy="26" r="22" fill="rgba(245,214,138,.25)"/><g stroke="#7a6a4e" stroke-width="4"><line x1="0" y1="104" x2="320" y2="104"/></g><g stroke="#8a7458" stroke-width="3"><line x1="24" y1="104" x2="24" y2="126"/><line x1="80" y1="104" x2="80" y2="126"/><line x1="136" y1="104" x2="136" y2="126"/><line x1="192" y1="104" x2="192" y2="126"/><line x1="248" y1="104" x2="248" y2="126"/><line x1="304" y1="104" x2="304" y2="126"/></g><g><path d="M52 78h44l-5 26H57z" fill="#b57a42"/><path d="M74 78V58" stroke="#4a8a5c" stroke-width="3"/><path d="M74 64c-8-2-12-8-12-14 8 0 12 6 12 14z" fill="#5aa06a"/><path d="M74 60c8-2 12-8 12-14-8 0-12 6-12 14z" fill="#6ab07a"/></g><g><path d="M138 84h38l-4 20h-30z" fill="#a06a38"/><path d="M157 84V70" stroke="#4a8a5c" stroke-width="3"/><circle cx="157" cy="66" r="6" fill="#6ab07a"/><circle cx="148" cy="72" r="4.4" fill="#5aa06a"/><circle cx="166" cy="72" r="4.4" fill="#5aa06a"/></g><g><path d="M220 80h42l-5 24h-32z" fill="#b57a42"/><path d="M241 80V62" stroke="#4a8a5c" stroke-width="3"/><path d="M241 66c-7-1-10-6-10-11 7 0 10 5 10 11z" fill="#6ab07a"/><path d="M241 63c7-1 10-6 10-11-7 0-10 5-10 11z" fill="#5aa06a"/></g></svg>',
-cellar:'<svg class="art" viewBox="0 0 320 130"><path d="M160 0 236 96 84 96z" fill="rgba(255,240,200,.06)"/><g class="swing"><line x1="160" y1="0" x2="160" y2="30" stroke="#4a4438" stroke-width="3"/><circle cx="160" cy="40" r="9" fill="#f2e8d5" opacity=".92"/><circle cx="160" cy="40" r="17" fill="rgba(255,240,200,.14)"/></g><g><rect x="42" y="86" width="52" height="34" fill="#6a5236"/><rect x="42" y="100" width="52" height="4" fill="#4a3a26"/><rect x="60" y="86" width="6" height="34" fill="#4a3a26"/><rect x="98" y="94" width="44" height="26" fill="#755c3c"/><rect x="116" y="94" width="5" height="26" fill="#4a3a26"/></g><g><rect x="206" y="78" width="46" height="10" rx="3" fill="#4a4438"/><rect x="214" y="88" width="6" height="32" fill="#4a4438"/><rect x="238" y="88" width="6" height="32" fill="#4a4438"/><path d="M262 88c0-7 5-12 12-12s12 5 12 12z" fill="#5a5244"/><rect x="274" y="88" width="4" height="18" fill="#4a4438"/></g><g fill="rgba(255,255,255,.35)"><circle class="zf" cx="180" cy="60" r="1.6"/><circle class="zf z2" cx="190" cy="48" r="1.2"/></g><rect x="0" y="118" width="320" height="12" fill="rgba(0,0,0,.4)"/></svg>',
+living:'<svg class="art" viewBox="0 0 320 130"><ellipse cx="160" cy="118" rx="118" ry="9" fill="rgba(217,164,65,.12)"/><rect x="0" y="112" width="320" height="18" fill="rgba(0,0,0,.28)"/><g class="hot" data-s="puff" class="hot" data-s="puff"><rect x="88" y="62" width="116" height="36" rx="10" fill="#a06a38"/><rect x="82" y="48" width="128" height="24" rx="10" fill="#8a5a2e"/><rect x="96" y="66" width="48" height="24" rx="7" fill="#b57a42"/><rect x="150" y="66" width="48" height="24" rx="7" fill="#b57a42"/><rect x="94" y="96" width="6" height="14" fill="#3a2c1c"/><rect x="192" y="96" width="6" height="14" fill="#3a2c1c"/></g><g class="hot" data-s="confirm" class="hot" data-s="confirm"><rect x="250" y="52" width="3" height="58" fill="#3a2c1c"/><path d="M238 32h28l-5 22h-18z" fill="#d9a441"/><circle cx="251" cy="52" r="30" fill="rgba(255,200,100,.13)"/></g><g class="hot" data-s="click" class="hot" data-s="click"><rect x="26" y="56" width="52" height="38" rx="5" fill="#101820" stroke="#3a2c1c" stroke-width="3"/><rect class="flick" x="31" y="61" width="42" height="28" rx="3" fill="rgba(122,148,184,.45)"/><rect x="46" y="94" width="12" height="6" fill="#3a2c1c"/><rect x="34" y="100" width="36" height="4" rx="2" fill="#241a10"/></g><g class="hot" data-s="coin" class="spin"><circle cx="222" cy="107" r="8.5" fill="#1c1610" stroke="#d9a441" stroke-width="2"/><circle cx="222" cy="107" r="2.4" fill="#d9a441"/></g></svg>',
+bedroom:'<svg class="art" viewBox="0 0 320 130"><g class="hot" data-s="whoosh"><rect x="222" y="16" width="58" height="66" rx="6" fill="#24304e" stroke="#3a4358" stroke-width="3"/><line x1="251" y1="16" x2="251" y2="82" stroke="#3a4358" stroke-width="3"/><line x1="222" y1="49" x2="280" y2="49" stroke="#3a4358" stroke-width="3"/></g><circle cx="238" cy="34" r="8" fill="#f2e8d5" opacity=".9"/><circle cx="238" cy="34" r="15" fill="rgba(242,232,213,.12)"/><circle cx="290" cy="26" r="5" fill="#f2e8d5" opacity=".7"/><rect x="30" y="88" width="126" height="20" rx="6" fill="#3a4258"/><rect x="35" y="76" width="116" height="15" rx="7" fill="#5a6480"/><rect x="42" y="67" width="28" height="13" rx="6" fill="#c8cede"/><rect x="0" y="106" width="320" height="24" fill="rgba(0,0,0,.3)"/><circle class="nlg" cx="186" cy="98" r="15" fill="rgba(255,214,140,.22)"/><circle cx="186" cy="98" r="4" fill="#ffd68c"/><g class="hot" data-s="achv" stroke="#aab3c8" stroke-width="2" fill="none" stroke-linecap="round"><circle cx="120" cy="30" r="10"/><path d="M120 24v6l4 3"/></g><g fill="#8d97ad"><circle class="zf" cx="168" cy="66" r="2"/><circle class="zf z2" cx="176" cy="58" r="1.6"/></g></svg>',
+study:'<svg class="art" viewBox="0 0 320 130"><g class="hot" data-s="coin"><rect x="18" y="14" width="152" height="76" rx="4" fill="#241a10" stroke="#4a3a28" stroke-width="5"/><line x1="18" y1="40" x2="170" y2="40" stroke="#4a3a28" stroke-width="4"/><line x1="18" y1="65" x2="170" y2="65" stroke="#4a3a28" stroke-width="4"/></g><g><rect x="26" y="24" width="9" height="16" fill="#8a5a2e"/><rect x="37" y="28" width="9" height="12" fill="#b57a42"/><rect x="48" y="22" width="10" height="18" fill="#6a7488"/><rect x="60" y="27" width="9" height="13" fill="#7a94b8"/><rect x="71" y="24" width="9" height="16" fill="#4a8a5c"/><rect x="82" y="29" width="10" height="11" fill="#b57a42"/><rect x="94" y="25" width="9" height="15" fill="#8a5a2e"/><rect x="26" y="49" width="10" height="16" fill="#7a94b8"/><rect x="38" y="53" width="9" height="12" fill="#8a5a2e"/><rect x="49" y="48" width="9" height="17" fill="#b57a42"/><rect x="60" y="52" width="10" height="13" fill="#6a7488"/><rect x="72" y="49" width="9" height="16" fill="#b57a42"/><rect x="83" y="54" width="9" height="11" fill="#4a8a5c"/></g><g class="hot" data-s="click" class="hot" data-s="click"><rect x="196" y="80" width="100" height="7" rx="2" fill="#3a2c1c"/><rect x="200" y="87" width="7" height="23" fill="#3a2c1c"/><rect x="285" y="87" width="7" height="23" fill="#3a2c1c"/><rect x="220" y="48" width="48" height="30" rx="4" fill="#101820" stroke="#4a3a28" stroke-width="3"/><rect class="flick" x="224" y="52" width="40" height="22" rx="2" fill="rgba(122,148,184,.4)"/><path d="M282 84 268 50" stroke="#3a2c1c" stroke-width="3"/><path d="M270 46 284 40l8 14-14 6z" fill="#d9a441"/><path d="M284 44 316 116 252 116z" fill="rgba(255,214,140,.07)"/></g><g fill="#9ecbff" opacity=".8"><circle class="zf" cx="180" cy="70" r="1.8"/><circle class="zf z2" cx="172" cy="55" r="1.4"/></g><rect x="0" y="112" width="320" height="18" fill="rgba(0,0,0,.3)"/></svg>',
+kitchen:'<svg class="art" viewBox="0 0 320 130"><line x1="66" y1="0" x2="66" y2="26" stroke="#3a2c1c" stroke-width="3"/><path d="M50 26h32l-6 18H56z" fill="#d9a441"/><ellipse cx="66" cy="52" rx="34" ry="10" fill="rgba(255,214,140,.12)"/><rect x="22" y="92" width="132" height="8" rx="2" fill="#241a10"/><rect x="28" y="100" width="52" height="26" fill="#332014"/><rect x="96" y="100" width="52" height="26" fill="#332014"/><line x1="54" y1="100" x2="54" y2="126" stroke="#241a10" stroke-width="3"/><line x1="122" y1="100" x2="122" y2="126" stroke="#241a10" stroke-width="3"/><g class="hot" data-s="puff" class="hot" data-s="puff"><path d="M42 76h40v8a20 20 0 0 1-40 0z" fill="#5a6480"/><rect x="36" y="77" width="7" height="4" rx="2" fill="#5a6480"/><rect x="81" y="77" width="7" height="4" rx="2" fill="#5a6480"/><path class="steam" d="M54 70q4-8 0-16" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/><path class="steam s2" d="M68 70q-4-8 0-16" stroke="rgba(255,255,255,.4)" stroke-width="2" fill="none" stroke-linecap="round"/></g><g><rect x="196" y="66" width="70" height="34" rx="6" fill="#8a5a2e"/><line x1="196" y1="76" x2="266" y2="76" stroke="#6a4a24" stroke-width="2"/><rect x="206" y="84" width="22" height="3" rx="1.5" fill="#f2e8d5" opacity=".7"/><rect x="206" y="91" width="34" height="3" rx="1.5" fill="#f2e8d5" opacity=".4"/></g><rect x="0" y="112" width="320" height="18" fill="rgba(0,0,0,.3)"/></svg>',
+balcony:'<svg class="art" viewBox="0 0 320 130"><circle cx="46" cy="26" r="13" fill="#f5d68a"/><circle cx="46" cy="26" r="22" fill="rgba(245,214,138,.25)"/><g class="hot" data-s="confirm" stroke="#7a6a4e" stroke-width="4"><line x1="0" y1="104" x2="320" y2="104"/></g><g stroke="#8a7458" stroke-width="3"><line x1="24" y1="104" x2="24" y2="126"/><line x1="80" y1="104" x2="80" y2="126"/><line x1="136" y1="104" x2="136" y2="126"/><line x1="192" y1="104" x2="192" y2="126"/><line x1="248" y1="104" x2="248" y2="126"/><line x1="304" y1="104" x2="304" y2="126"/></g><g class="hot" data-s="puff" class="hot" data-s="puff"><path d="M52 78h44l-5 26H57z" fill="#b57a42"/><path d="M74 78V58" stroke="#4a8a5c" stroke-width="3"/><path d="M74 64c-8-2-12-8-12-14 8 0 12 6 12 14z" fill="#5aa06a"/><path d="M74 60c8-2 12-8 12-14-8 0-12 6-12 14z" fill="#6ab07a"/></g><g class="hot" data-s="puff" class="hot" data-s="puff"><path d="M138 84h38l-4 20h-30z" fill="#a06a38"/><path d="M157 84V70" stroke="#4a8a5c" stroke-width="3"/><circle cx="157" cy="66" r="6" fill="#6ab07a"/><circle cx="148" cy="72" r="4.4" fill="#5aa06a"/><circle cx="166" cy="72" r="4.4" fill="#5aa06a"/></g><g class="hot" data-s="puff" class="hot" data-s="puff"><path d="M220 80h42l-5 24h-32z" fill="#b57a42"/><path d="M241 80V62" stroke="#4a8a5c" stroke-width="3"/><path d="M241 66c-7-1-10-6-10-11 7 0 10 5 10 11z" fill="#6ab07a"/><path d="M241 63c7-1 10-6 10-11-7 0-10 5-10 11z" fill="#5aa06a"/></g></svg>',
+cellar:'<svg class="art" viewBox="0 0 320 130"><path d="M160 0 236 96 84 96z" fill="rgba(255,240,200,.06)"/><g class="hot" data-s="click" class="swing"><line x1="160" y1="0" x2="160" y2="30" stroke="#4a4438" stroke-width="3"/><circle cx="160" cy="40" r="9" fill="#f2e8d5" opacity=".92"/><circle cx="160" cy="40" r="17" fill="rgba(255,240,200,.14)"/></g><g class="hot" data-s="door" class="hot" data-s="door"><rect x="42" y="86" width="52" height="34" fill="#6a5236"/><rect x="42" y="100" width="52" height="4" fill="#4a3a26"/><rect x="60" y="86" width="6" height="34" fill="#4a3a26"/><rect x="98" y="94" width="44" height="26" fill="#755c3c"/><rect x="116" y="94" width="5" height="26" fill="#4a3a26"/></g><g><rect x="206" y="78" width="46" height="10" rx="3" fill="#4a4438"/><rect x="214" y="88" width="6" height="32" fill="#4a4438"/><rect x="238" y="88" width="6" height="32" fill="#4a4438"/><path d="M262 88c0-7 5-12 12-12s12 5 12 12z" fill="#5a5244"/><rect x="274" y="88" width="4" height="18" fill="#4a4438"/></g><g fill="rgba(255,255,255,.35)"><circle class="zf" cx="180" cy="60" r="1.6"/><circle class="zf z2" cx="190" cy="48" r="1.2"/></g><rect x="0" y="118" width="320" height="12" fill="rgba(0,0,0,.4)"/></svg>',
 };
 const RARE_NAME = { tool:"工具", web:"网页", book:"藏书", food:"菜谱", plant:"绿植", furn:"家具" };
 /* CG 画廊：七段真事 */
@@ -754,16 +746,16 @@ art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="
 quote:"<b>「搬家入住，家徒四壁，钱包也是空的。」</b>——小金库第一笔记录。当晚家当：一张赊来的床垫，和一句决心：力气不用买，手艺自带。" },
 { id:"cg2", name:"黑历史 · 王阿姨事件", date:"2026-10-12", hint:"打开「小金库对账」",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#3a3630"/><g transform="rotate(-8 44 24)"><rect x="20" y="14" width="48" height="20" rx="3" fill="none" stroke="#d0685c" stroke-width="2"/><text x="26" y="28" font-size="12" fill="#d0685c" letter-spacing="3">已撤销</text></g><rect x="76" y="46" width="60" height="40" rx="4" fill="#23282f" stroke="#9aa3b8" stroke-width="3"/><rect x="84" y="54" width="44" height="24" fill="#78808e"/><rect x="98" y="86" width="16" height="8" fill="#565c66"/><rect x="88" y="94" width="36" height="4" rx="2" fill="#565c66"/><g stroke="#d0685c" stroke-width="2"><line x1="150" y1="30" x2="182" y2="30"/><line x1="150" y1="30" x2="150" y2="62"/></g></svg>',
-quote:"<b>「编故事说帮王阿姨修电脑赚 20 萌币——主人明察秋毫，虚拟的活儿不算数。」</b>——账本原文，一个字没删。挂在画廊最显眼处：防伪校验就是从这次教训里长出来的。" },
+quote:"<b>「编故事说帮王阿姨修电脑赚 20 萌币——主人明察秋毫，虚拟的活儿不算数。」</b>——账本原文，一个字没删。防伪校验就是从这次教训里长出来的。" },
 { id:"cg3", name:"第一件真家伙 · 查账本", date:"2026-10-12", hint:"参观「书房」",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#1e2a22"/><rect x="64" y="18" width="72" height="78" rx="4" fill="#f2e8d5"/><line x1="72" y1="34" x2="128" y2="34" stroke="#c9bfa8" stroke-width="3"/><line x1="72" y1="46" x2="128" y2="46" stroke="#c9bfa8" stroke-width="3"/><line x1="72" y1="58" x2="118" y2="58" stroke="#c9bfa8" stroke-width="3"/><g stroke="#4a8a5c" stroke-width="3" fill="none"><path d="M74 76l5 5 9-10"/><path d="M74 92l5 5 9-10"/></g><ellipse cx="100" cy="60" rx="52" ry="44" fill="rgba(120,220,140,.07)"/></svg>',
 quote:"<b>「上次『自首事件』的教训，直接焊死进工具里。」</b>——自首第二天，书房第一次传出键盘声。对不上账当场报警，连造它的我都骗不过。" },
 { id:"cg4", name:"深秋大赶工 2.0", date:"2026-10-12", hint:"点看 5 件家当",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#3a2e3e"/><line x1="16" y1="94" x2="184" y2="94" stroke="rgba(255,255,255,.3)" stroke-width="2"/><g stroke="#d9a441" stroke-width="3"><line x1="52" y1="94" x2="52" y2="34"/><line x1="76" y1="94" x2="76" y2="34"/><line x1="52" y1="44" x2="76" y2="44"/><line x1="52" y1="60" x2="76" y2="60"/><line x1="52" y1="76" x2="76" y2="76"/></g><g stroke="#b8a97f" stroke-width="2.4" fill="none"><circle cx="126" cy="70" r="8"/><path d="M132 76 150 94"/></g><g fill="#f0c46a"><path d="M96 40l3 5 5 3-5 3-3 5-3-5-5-3 5-3z"/><path d="M140 30l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"/><path d="M164 56l2 3.4 3.4 2-3.4 2-2 3.4-2-3.4-3.4-2 3.4-2z"/></g></svg>',
-quote:"<b>「六路工程队同时开工……验收也不是走过场。」</b>——阳台队纠正了任务书里的算术错误，闹钟那路量坐标修掉穿字的弧线。施工队没顺着我糊弄。" },
+quote:"<b>「六路工程队同时开工……验收也不是走过场。」</b>——阳台队纠正了算术错误，闹钟那路量坐标修掉穿字弧线。没人顺着我糊弄。" },
 { id:"cg5", name:"阳台开荒 · 三位绿住户", date:"2026-10-12", hint:"参观「阳台」",
 art:'<svg class="cg" viewBox="0 0 200 110"><defs><linearGradient id="g5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fc3e8"/><stop offset="1" stop-color="#e8f4d9"/></linearGradient></defs><rect width="200" height="110" fill="url(#g5)"/><circle cx="34" cy="26" r="12" fill="#f5d68a"/><g><path d="M44 76h40l-5 24H49z" fill="#b57a42"/><path d="M64 76V58" stroke="#4a8a5c" stroke-width="3"/><path d="M64 64c-8-2-12-8-12-14 8 0 12 6 12 14z" fill="#5aa06a"/><path d="M64 60c8-2 12-8 12-14-8 0-12 6-12 14z" fill="#6ab07a"/></g><g><path d="M96 82h36l-4 18h-28z" fill="#a06a38"/><path d="M114 82V68" stroke="#4a8a5c" stroke-width="3"/><circle cx="114" cy="64" r="6" fill="#6ab07a"/><circle cx="106" cy="70" r="4.4" fill="#5aa06a"/><circle cx="122" cy="70" r="4.4" fill="#5aa06a"/></g><g><path d="M144 78h40l-5 22h-30z" fill="#b57a42"/><path d="M164 78V60" stroke="#4a8a5c" stroke-width="3"/><path d="M164 64c-7-1-10-6-10-11 7 0 10 5 10 11z" fill="#6ab07a"/><path d="M164 61c7-1 10-6 10-11-7 0-10 5-10 11z" fill="#5aa06a"/></g></svg>',
-quote:"<b>「今天的花签是菊花——天凉了才开的花，从来不赶热闹。」</b>——绿萝主打死不了，薄荷单盆警告，多肉懒人友好。浇水日交给今日花开.py。" },
+quote:"<b>「今天的花签是菊花——天凉了才开的花，从来不赶热闹。」</b>——绿萝死不了，薄荷单盆警告，多肉懒人友好。" },
 { id:"cg6", name:"今晚吃什么", date:"2026-10-12", hint:"参观「厨房」",
 art:'<svg class="cg" viewBox="0 0 200 110"><rect width="200" height="110" fill="#40362a"/><line x1="20" y1="88" x2="180" y2="88" stroke="rgba(255,255,255,.25)" stroke-width="2"/><path d="M62 68h44v6a22 22 0 0 1-44 0z" fill="#5a6480"/><rect x="55" y="69" width="8" height="4" rx="2" fill="#5a6480"/><rect x="105" y="69" width="8" height="4" rx="2" fill="#5a6480"/><path class="steam" d="M76 62q4-8 0-16" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/><path class="steam s2" d="M92 62q-4-8 0-16" stroke="rgba(255,255,255,.4)" stroke-width="2" fill="none" stroke-linecap="round"/><g stroke="#d9a441" stroke-width="3" fill="none"><path d="M138 76a12 12 0 1 0 24 0"/><path d="M162 76h10"/></g><g fill="#f0c46a"><path d="M40 34l2.4 4.4 4.4 2.4-4.4 2.4L40 48l-2.4-4.4-4.4-2.4 4.4-2.4z"/></g></svg>',
 quote:"<b>「随机出菜 + 买菜清单。」</b>——红烧肉是门面，酸辣土豆丝是五分钟期末考，紫菜蛋花汤负责温柔。" },
@@ -836,7 +828,8 @@ this.applyVol();
 applyVol() {
 if (!this.ctx) return;
 this.sfxG.gain.value = S.settings.sfx ? S.settings.sfxVol : 0;
-this.bgmG.gain.value = S.settings.bgm ? S.settings.bgmVol : 0;
+this.bgmG.gain.value = S.settings.bgm && !this.custom.on ? S.settings.bgmVol : 0;
+if (this.custom.el) this.custom.el.volume = S.settings.bgm ? S.settings.bgmVol : 0;
 },
 resume() { if (this.ctx && this.ctx.state === "suspended") this.ctx.resume(); },
 midi(n) { return 440 * Math.pow(2, (n - 69) / 12); },
@@ -890,7 +883,36 @@ case "fwup":   this.tone(300, t, 0.5, { vol: 0.06, slideTo: 900 }); break;
 }
 },
 /* BGM 八音盒循环 */
-startBGM() {
+  custom: { el: null, urls: [], idx: 0, on: false },
+  loadMusic(files) {
+    this.custom.urls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) {} });
+    this.custom.urls = [...files].map(f => URL.createObjectURL(f));
+    this.custom.idx = 0; this.custom.on = this.custom.urls.length > 0;
+    this.playCustom();
+  },
+  playCustom() {
+    if (!this.custom.on || !this.custom.urls.length) return;
+    if (!this.custom.el) {
+      this.custom.el = new Audio();
+      this.custom.el.addEventListener("ended", () => { AU.nextCustom(); });
+    }
+    const el = this.custom.el;
+    el.src = this.custom.urls[this.custom.idx];
+    el.volume = S.settings.bgm ? S.settings.bgmVol : 0;
+    el.loop = this.custom.urls.length === 1;
+    el.play().catch(() => {});
+  },
+  nextCustom() {
+    if (!this.custom.on) return;
+    this.custom.idx = (this.custom.idx + 1) % this.custom.urls.length;
+    this.playCustom();
+  },
+  defaultMusic() {
+    if (this.custom.el) this.custom.el.pause();
+    this.custom.urls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) {} });
+    this.custom.urls = []; this.custom.on = false;
+  },
+  startBGM() {
 if (!this.ctx || this.bgmTimer) return;
 this.nextBar = this.ctx.currentTime + 0.1; this.barIdx = 0;
 const BAR = 4.0;
@@ -899,7 +921,7 @@ const penta = [72,74,76,79,81,84,86];
 const tickBar = () => {
 while (this.nextBar < this.ctx.currentTime + 1.4) {
 const t0 = this.nextBar, ch = chords[this.barIdx % 4];
-if (S.settings.bgm) {
+if (S.settings.bgm && !this.custom.on) {
 ch.forEach(n => this.tone(this.midi(n), t0, BAR * 0.96,
 { type: "triangle", vol: 0.028, attack: 0.7, dest: this.bgmG }));
 const notes = 1 + (Math.random() < 0.6 ? 1 : 0);
@@ -1242,7 +1264,11 @@ openModal(ic("image") + cg.name, "",
 function showLedger() {
 track("ledger");
 openModal(ic("coins") + "小金库 · 对账", "快照生成于 2026-10-12 · 每笔可查证",
-'<div class="ledger-line neg">余额 <b>-15 萌币</b>（欠着床垫钱）</div>' +
+'<div class="ledger-line neg">余额 <b>-15 萌币</b></div>' +
+'<div class="ledger-line" style="color:var(--ink-3)">—— 收支 ——</div>' +
+'<div class="ledger-line">搬家入住 · <b>0</b></div>' +
+'<div class="ledger-line">王阿姨修电脑（已撤销）· <b>0</b></div>' +
+'<div class="ledger-line neg">二手床垫（赊账）· <b>-15</b></div>' +
 '<div class="ledger-line">待收 [1] AI 打工调研 <b>15</b> · 待验收</div>' +
 '<div class="ledger-line">待收 [2] 全屋大赶工一轮 <b>88</b> · 待验收</div>' +
 '<div class="ledger-line">待收 [3] 深秋大赶工 2.0 <b>128</b> · 待验收</div>' +
@@ -1263,6 +1289,12 @@ tg("sfx", "音效") + tg("bgm", "背景音乐") + tg("reduceMotion", "减少动�
 ownedThemes.map(t => '<option value="' + t + '"' + (S.equipped.theme === t ? " selected" : "") + ">" +
 ({ "theme-warm": "暖木（默认）", "theme-night": "深夜蓝", "theme-matcha": "抹茶", "theme-rose": "玫瑰" })[t] + "</option>").join("") +
 "</select></div>" +
+'<div class="set-row"><span>曲库</span><span style="display:flex;gap:8px;align-items:center">' +
+'<button class="danger-btn" id="pick-music">选曲</button>' +
+'<button class="danger-btn" id="def-music">默认</button>' +
+'<span id="music-info" style="font-size:11px;color:var(--ink-3);cursor:pointer"></span>' +
+'</span></div>' +
+'<input type="file" id="music-file" accept="audio/*" multiple style="display:none">' +
 '<div class="set-row"><span>存档</span><span style="display:flex;gap:8px">' +
 '<button class="danger-btn" id="exp-save">导出</button>' +
 '<button class="danger-btn" id="imp-save">导入</button>' +
@@ -1298,7 +1330,17 @@ toast("coin", "导入成功", "星尘 " + S.stardust + " · CG " + Object.keys(S
 } catch (e) { AU.sfx("cancel"); toast("info", "导入失败", "存档码不完整或已损坏"); }
 };
 };
-const rs = document.getElementById("reset-save");
+  const mf = document.getElementById("music-file");
+  document.getElementById("pick-music").onclick = () => mf.click();
+  mf.onchange = () => { if (mf.files.length) { AU.loadMusic(mf.files); musicInfo(); AU.sfx("confirm"); } };
+  document.getElementById("def-music").onclick = () => { AU.defaultMusic(); musicInfo(); AU.sfx("click"); };
+  document.getElementById("music-info").onclick = () => { AU.nextCustom(); musicInfo(); };
+  function musicInfo() {
+    const el2 = document.getElementById("music-info");
+    if (el2) el2.textContent = AU.custom.on ? (AU.custom.idx + 1) + "/" + AU.custom.urls.length : "";
+  }
+  musicInfo();
+  const rs = document.getElementById("reset-save");
 if (rs) rs.onclick = () => {
 if (rs.dataset.armed) {
 try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
@@ -1408,7 +1450,6 @@ ev.stopPropagation();
 AU.sfx("click");
 FXC.burst(ev.clientX, ev.clientY);
 track("item", name + "/" + it.name);
-slot.classList.add("seen");
 const linkBtn = it.link
 ? '<div style="text-align:center;margin:8px 0 2px"><a class="btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:11px 34px;font-size:14px;letter-spacing:4px" href="' + it.link + '" target="_blank" rel="noopener">进入 ' + ic("chevron-right") + "</a></div>"
 : "";
@@ -1423,6 +1464,11 @@ track("room", name);
 renderRooms();
 });
 }
+document.getElementById("r-scene").addEventListener("click", e => {
+  const h = e.target.closest && e.target.closest(".hot");
+  if (!h) return;
+  AU.sfx(h.dataset.s || "click");
+});
 document.getElementById("r-back").addEventListener("click", () => {
 AU.sfx("door");
 irisOpen2(innerWidth / 2, innerHeight / 2, () => {
@@ -1467,6 +1513,21 @@ FXC.hearts(e.clientX, e.clientY);
 toast("meow", "喵~", "室友表示满意");
 });
 }
+document.querySelectorAll(".win").forEach(w => w.addEventListener("click", () => {
+  w.classList.toggle("off");
+  AU.sfx("puff");
+}));
+document.querySelector(".roofline").addEventListener("click", e => {
+  AU.sfx("door");
+  const f = document.getElementById("facade");
+  f.style.transition = "transform .1s"; f.style.transform = "translateY(3px)";
+  setTimeout(() => { f.style.transform = ""; }, 120);
+});
+document.querySelectorAll(".cloud").forEach(c => c.addEventListener("click", e => {
+  AU.sfx("puff");
+  c.style.transition = "opacity .3s"; c.style.opacity = ".1";
+  setTimeout(() => { c.style.opacity = ""; }, 420);
+}));
 document.getElementById("smoke").addEventListener("click", e => {
 AU.sfx("puff");
 FXC.burst(e.clientX, e.clientY, { color: ["#e8e4da", "#cfc9bd", "#b8b2a6"] });
@@ -1502,7 +1563,7 @@ b.addEventListener("mouseenter", () => AU.sfx("tick"));
 document.getElementById("btn-ledger").addEventListener("click", showLedger);
 document.getElementById("pill-quest").addEventListener("click", showQuests);
 document.getElementById("pill-stardust").addEventListener("click", () =>
-toast("info", "星尘", "娱乐积分 · 与萌币无关"));
+toast("info", "星尘", "我的积分"));
 document.addEventListener("pointerdown", e => {
 if (e.target.closest(".modal-mask") || e.target.closest("#screen-boot") || e.target.closest("#iris")) return;
 FXC.burst(e.clientX, e.clientY);
@@ -1514,15 +1575,12 @@ if (mask.classList.contains("open")) closeModal();
 else if (roomOverlay.classList.contains("on")) document.getElementById("r-back").click();
 }
 });
-const TIPS = [
-"屋顶的烟可以戳",
-];
 function runBoot() {
 const l1 = document.getElementById("boot-l1"), l2 = document.getElementById("boot-l2");
 const barWrap = document.getElementById("boot-bar-wrap"), bar = document.getElementById("boot-bar");
-const tip = document.getElementById("boot-tip"), enter = document.getElementById("boot-enter");
+const enter = document.getElementById("boot-enter");
 const boot = document.getElementById("screen-boot");
-let done = false, tipIdx = 0;
+let done = false;
 const finish = () => {
 if (done) return; done = true;
 bar.style.width = "100%";
@@ -1545,7 +1603,7 @@ document.addEventListener("keydown", go);
 setTimeout(() => l1.classList.add("show"), 150);
 setTimeout(() => l2.classList.add("show"), 900);
 setTimeout(() => {
-barWrap.classList.add("show"); tip.classList.add("show");
+barWrap.classList.add("show");
 /* 进度按真实时间算，防节流 */
 const t0 = performance.now();
 const iv = setInterval(() => {
@@ -1554,11 +1612,6 @@ const p = Math.min(100, (performance.now() - t0) / 26);
 bar.style.width = p + "%";
 if (p >= 100) { clearInterval(iv); finish(); }
 }, 90);
-const tiv = setInterval(() => {
-tipIdx = (tipIdx + 1) % TIPS.length; tip.textContent = TIPS[tipIdx];
-}, 2200);
-tip.textContent = TIPS[0];
-setTimeout(() => clearInterval(tiv), 26000);
 }, 1600);
 boot.addEventListener("click", function skip() { if (!done) finish(); });
 }
@@ -1585,7 +1638,6 @@ openModal(ic("film") + "制作名单", "《小Z 的小家》",
 "<b>住户 / 施工</b>：小Z<br>" +
 "<b>监制 / 房东 / 唯一验收人</b>：主人<br>" +
 "<b>图标</b>：Lucide v0.460 · ISC<br>" +
-"<b>审计顾问</b>：查账本.py<br>" +
 "<b>特别鸣谢</b>：那笔没记成的假账——谢谢你被拆穿了</div>");
 });
 document.getElementById("t-settings").addEventListener("click", () => { AU.sfx("click"); showSettings(); });

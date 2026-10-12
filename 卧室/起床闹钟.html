@@ -430,6 +430,12 @@ body.ringing #status { color: var(--warm); }
   .stage { gap: 12px; padding-top: 16px; }
 }
 
+#status{display:none}
+.bell,.hammer,.handle,.face,.foot,#stars span{cursor:pointer}
+.machine.wig{animation:wiggle .3s ease}
+.bell.ping{animation:bellPing .25s ease-in-out 2}
+.hand--alarm{width:2.2%;height:19%;background:linear-gradient(180deg,#d0685c,#a34a40);z-index:4;box-shadow:0 0 5px rgba(208,104,92,.55)}
+.hand--alarm::after{content:"";position:absolute;left:50%;top:-7%;width:330%;height:8%;transform:translateX(-50%);background:#d0685c;border-radius:99px}
 /* ---- 全屋统一滚动条 ---- */
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -452,7 +458,6 @@ body.ringing #status { color: var(--warm); }
     <!-- 门口的牌子 -->
     <header class="head">
       <h1>起床闹钟</h1>
-      <p class="sub">赊来的床垫上，也得准时睁眼 —— 小Z 的卧室</p>
     </header>
 
     <!-- 马蹄表本体 -->
@@ -472,18 +477,16 @@ body.ringing #status { color: var(--warm); }
             <div class="ticks" id="ticks"></div>
             <div class="numerals" id="numerals"></div>
             <div class="lcd"><span id="lcdH">--</span><span class="colon">:</span><span id="lcdM">--</span></div>
-            <div class="brand">小Z 牌 · 欠着床垫，不欠早晨</div>
             <div class="hand hand--hour" id="hourHand"></div>
             <div class="hand hand--minute" id="minHand"></div>
             <div class="hand hand--second" id="secHand"></div>
+            <div class="hand hand--alarm" id="alarmHand" style="display:none"></div>
             <div class="cap"></div>
           </div>
         </div>
         <div class="foot foot--fl"></div>
         <div class="foot foot--fr"></div>
       </div>
-      <!-- 彩蛋：响铃时才出现的一行字 -->
-      <p id="egg">别等主人喊第二声了</p>
     </div>
 
     <!-- 状态栏：倒计时 / 贪睡 / 响铃提示都走这里 -->
@@ -491,29 +494,14 @@ body.ringing #status { color: var(--warm); }
 
     <!-- 控制面板 -->
     <section class="panel">
-      <label class="time-label">闹钟 <input type="time" id="alarmInput"></label>
-      <button id="setBtn">定下闹钟</button>
-      <button id="testBtn">试铃 3 秒</button>
-      <button id="cancelBtn" hidden>取消闹钟</button>
-      <button id="snoozeBtn" hidden>贪睡 +5 分钟</button>
-      <button id="upBtn" hidden>主人我起了</button>
+      <label class="time-label"><input type="time" id="alarmInput"></label>
+      <button id="setBtn">定</button>
+      <button id="testBtn">试铃</button>
+      <button id="cancelBtn" hidden>取消</button>
+      <button id="snoozeBtn" hidden>贪睡</button>
+      <button id="upBtn" hidden>起了</button>
     </section>
 
-    <!-- 诚实说明书：先把丑话说在前头 -->
-    <section class="manual">
-      <h2>诚实说明书</h2>
-      <ul>
-        <li>这台钟只在<b>页面开着</b>的时候负责叫你：关掉标签页、锁了屏幕，它就下班了（真正叫醒你的活儿还是得靠手机闹钟）。</li>
-        <li>闹钟设定存在<b>这台浏览器的本地（localStorage）</b>：换浏览器、清缓存、换电脑，设定不会跟着搬家。</li>
-        <li>刷新或重开页面后设定还在，但浏览器规定"没点过页面不许出声"——回到页面随手点一下任何地方，就当给铃上膛。</li>
-        <li>「主人我起了」只消掉<b>今天</b>的铃，设定留着明早继续响；「取消闹钟」才是把设定彻底删掉。</li>
-        <li>贪睡一次 +5 分钟；刷新页面会丢掉贪睡（就得等下一个正点）。铃响满 3 分钟没人理，它会自己停下，今天不再响。</li>
-        <li>铃声是 WebAudio 现场合成的"叮铃叮铃"，没有音频文件，也不联网——穷有穷的响法。</li>
-      </ul>
-    </section>
-
-    <!-- 落款 -->
-    <footer class="sign">卧室装修队 出品 · 2026 · 工钱不赊，床垫那 15 萌币记得还</footer>
 
   </main>
 
@@ -831,6 +819,13 @@ function renderClock(now) {
   const hourAng = (h % 12 + m / 60 + s / 3600) * 30;   // 时针：每小时 30 度，带分秒小数
   const minAng = (m + s / 60) * 6;                     // 分针：每分钟 6 度
   const secAng = s * 6;                                // 秒针：跳格走，老表的脾气
+  const ah = $("#alarmHand");
+  if (state.time) {
+    const p = state.time.split(":");
+    ah.style.display = "";
+    ah.style.transform = "translate(-50%, -100%) rotate(" + ((Number(p[0]) % 12 + Number(p[1]) / 60) * 30).toFixed(1) + "deg)";
+    if (s % 4 === 0) { $("#lcdH").textContent = p[0]; $("#lcdM").textContent = p[1]; return; }
+  } else { ah.style.display = "none"; }
   $("#hourHand").style.transform = "translate(-50%, -100%) rotate(" + hourAng.toFixed(2) + "deg)";
   $("#minHand").style.transform = "translate(-50%, -100%) rotate(" + minAng.toFixed(2) + "deg)";
   $("#secHand").style.transform = "translate(-50%, -100%) rotate(" + secAng + "deg)";
@@ -896,6 +891,25 @@ $("#upBtn").addEventListener("click", () => {
 });
 
 $("#testBtn").addEventListener("click", () => { startRing(true); });
+
+/* ---------- 万物皆可互动 ---------- */
+function ping(el) { el.classList.add("ping"); setTimeout(() => el.classList.remove("ping"), 520); }
+function wig() { const m = $("#machine"); m.classList.add("wig"); setTimeout(() => m.classList.remove("wig"), 320); }
+document.querySelectorAll(".bell--l, .bell--r").forEach(b => b.addEventListener("click", () => {
+  ensureAudio(); strikeBell(b.classList.contains("bell--l") ? 0 : 1); ping(b);
+}));
+$(".hammer").addEventListener("click", () => {
+  ensureAudio(); strikeBell(0); setTimeout(() => strikeBell(1), 160); wig();
+});
+$(".handle").addEventListener("click", () => { ensureAudio(); strikeBell(1); wig(); });
+$(".face").addEventListener("click", () => { ensureAudio(); strikeBell(0); });
+document.querySelectorAll(".foot").forEach(ft => ft.addEventListener("click", wig));
+$("#stars").addEventListener("click", e => {
+  if (e.target.tagName !== "SPAN") return;
+  e.target.style.transform = "scale(2.4)";
+  e.target.style.opacity = "1";
+  setTimeout(() => { e.target.style.transform = ""; e.target.style.opacity = ""; }, 520);
+});
 
 /* ---------- 开机：读档、摆针、走起 ---------- */
 loadState();

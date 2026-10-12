@@ -47,7 +47,7 @@
   }
 
   /* ---------- 天线（电视顶上两根，可爱担当） ---------- */
-  .antenna-box{ position:relative; width:min(640px,92vw); height:0; }
+  .antenna-box{ position:relative; width:min(640px,92vw); height:0; cursor:pointer; }
   .antenna{
     position:absolute; bottom:-6px; width:5px; border-radius:3px;
     background:linear-gradient(180deg,#c9c9cf,#6f6f78);
@@ -221,7 +221,7 @@
   .chbtn.reset:active{ box-shadow:0 1px 0 #9a4b2c; }
 
   /* 喇叭格栅：斜纹布面 */
-  .speaker{
+  .speaker{ cursor:pointer;
     width:120px; height:64px; border-radius:12px;
     background:
       repeating-linear-gradient(45deg, #35200f 0 3px, #6b4527 3px 8px);
@@ -1096,6 +1096,9 @@ document.getElementById('ch2').addEventListener('click', function () { switchCha
 document.getElementById('resetBtn').addEventListener('click', resetCurrent);
 document.getElementById('powerKnob').addEventListener('click', reboot);
 document.getElementById('soundKnob').addEventListener('click', toggleSound);
+/* 喇叭：拍一下出雪花声；天线：碰一下重新开机 */
+document.querySelector(".speaker").addEventListener("click", function () { Sfx.ensure(); Sfx.on = true; Sfx.snow(); setTimeout(function () { if (store.get(K_SOUND, "0") !== "1") Sfx.on = false; }, 400); });
+document.querySelector(".antenna-box").addEventListener("click", reboot);
 
 /* ---------- 屏上十字键 ---------- */
 document.querySelectorAll('.dbtn[data-dir]').forEach(function (b) {
