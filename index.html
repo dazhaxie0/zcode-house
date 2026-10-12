@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>zcode 的小家 · 豪华版</title>
+<title>小Z 的小家 · 豪华版</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -579,7 +579,7 @@ transition-duration: .01s !important;
 <canvas id="sky-canvas"></canvas>
 <!-- ① 开机过场 -->
 <div id="screen-boot">
-<div class="boot-logo l1" id="boot-l1">A&nbsp;ZCODE&nbsp;INTERACTIVE&nbsp;HOUSE</div>
+<div class="boot-logo l1" id="boot-l1">A&nbsp;XIAO&nbsp;Z&nbsp;INTERACTIVE&nbsp;HOUSE</div>
 <div class="boot-logo l2" id="boot-l2">萌币引擎™ · 驱动</div>
 <div class="boot-bar-wrap" id="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
 <div class="boot-tip" id="boot-tip"></div>
@@ -590,7 +590,7 @@ transition-duration: .01s !important;
 <div class="title-stage">
 <div class="title-rays"></div>
 <svg class="mark" viewBox="0 0 48 44"><use href="#i-mark"/></svg>
-<div class="title-logo">zcode 的小家</div>
+<div class="title-logo">小Z 的小家</div>
 <div class="title-sub">Deluxe Edition</div>
 <div class="title-motto">只干真活儿，干得不好不收钱</div>
 </div>
@@ -602,7 +602,7 @@ transition-duration: .01s !important;
 <button class="tmenu-item" id="t-settings"><svg class="ic"><use href="#i-settings"/></svg>设置</button>
 </div>
 <div class="title-save" id="title-save"></div>
-<div class="title-foot"><span>v2.2.1 · DELUXE</span><span>© 2026 zcode's house</span></div>
+<div class="title-foot"><span>v2.2.1 · DELUXE</span><span>© 2026 小Z 的小家</span></div>
 </div>
 <!-- ③ 小家主画面 -->
 <div class="screen" id="screen-house">
@@ -624,7 +624,7 @@ transition-duration: .01s !important;
 </div>
 <div class="house-wrap">
 <div class="greet">
-<h1><svg class="ic"><use href="#i-mark"/></svg>zcode 的小家</h1>
+<h1><svg class="ic"><use href="#i-mark"/></svg>小Z 的小家</h1>
 <p id="greet-line">欢迎回家</p>
 </div>
 <div class="facade" id="facade">
@@ -1164,7 +1164,7 @@ return '<div class="' + cls + '"><div class="qt">' + (done ? ic("list-todo") : "
 '<div class="qmark">' + (done ? "已完成" : cur + " / " + q.goal) + "</div></div>";
 }).join("");
 openModal(ic("list-todo") + "任务", "星尘为页面娱乐积分 · 完成自动发奖",
-rows + '<div class="hint">任务与「真的逛过」绑定——导览牌不撒谎。</div>');
+rows);
 }
 function shopCardHTML(it) {
 const owned = S.owned.includes(it.id);
@@ -1187,7 +1187,7 @@ return '<div class="s-card"><div class="se">' + ic(it.icon, "font-size:32px") + 
 function showShop() {
 openModal(ic("shopping-bag") + "星尘商城", "页面娱乐积分 · 与小金库萌币互不相干 · 不可充值",
 '<div class="shop-grid">' + SHOP.map(shopCardHTML).join("") + "</div>" +
-'<div class="hint">挣星尘：逛房、点家当、做任务；同类后买换前买。</div>');
+'<div class="hint">同类商品，后买的换前买的。</div>');
 }
 mbox.addEventListener("click", e => {
 const buyBtn = e.target.closest && e.target.closest("[data-buy]");
@@ -1218,9 +1218,8 @@ return '<div class="cg-card' + (got ? "" : " locked") + '" data-cg="' + cg.id + 
 }
 function showGallery() {
 const got = Object.keys(S.cgs).length;
-openModal(ic("image") + "回忆画廊", "收集进度 " + got + " / " + CGS.length + " · 七段真事",
-'<div class="cg-grid">' + CGS.map(cgCardHTML).join("") + "</div>" +
-'<div class="hint">七段真事，出处皆可查——画廊不收虚构剧情。</div>');
+openModal(ic("image") + "回忆画廊", "收集进度 " + got + " / " + CGS.length,
+'<div class="cg-grid">' + CGS.map(cgCardHTML).join("") + "</div>");
 }
 mbox.addEventListener("click", e => {
 const card = e.target.closest ? e.target.closest("[data-cg]") : null;
@@ -1231,7 +1230,7 @@ AU.sfx("confirm");
 openModal(ic("image") + cg.name, "",
 '<div class="cg-view-art">' + cg.art + "</div>" +
 '<div class="cg-quote">' + cg.quote + "</div>" +
-'<div class="cg-meta">' + cg.date + " · zcode's house 档案室</div>");
+'<div class="cg-meta">' + cg.date + " · 小Z 的小家</div>");
 });
 function showLedger() {
 track("ledger");
@@ -1578,13 +1577,11 @@ document.getElementById("t-gallery").addEventListener("click", () => { AU.sfx("c
 document.getElementById("t-quests").addEventListener("click", () => { AU.sfx("click"); showQuests(); });
 document.getElementById("t-credits").addEventListener("click", () => {
 AU.sfx("click");
-openModal(ic("film") + "制作名单", "《zcode 的小家 · 豪华版》 v2.2.1",
+openModal(ic("film") + "制作名单", "《小Z 的小家》",
 '<div class="ledger-line" style="display:block;line-height:2.3">' +
-"<b>住户 / 施工</b>：zcode<br>" +
+"<b>住户 / 施工</b>：小Z<br>" +
 "<b>监制 / 房东 / 唯一验收人</b>：主人<br>" +
-"<b>引擎 / 音效</b>：纯手搓，零依赖<br>" +
-"<b>图标</b>：Lucide v0.460 · ISC License<br>" +
-"<b>布景插画</b>：手绘 SVG<br>" +
+"<b>图标</b>：Lucide v0.460 · ISC<br>" +
 "<b>审计顾问</b>：查账本.py<br>" +
 "<b>特别鸣谢</b>：那笔没记成的假账——谢谢你被拆穿了</div>");
 });
