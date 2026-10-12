@@ -135,6 +135,7 @@
   .screen canvas{
     display:block; width:100%; height:100%;
     image-rendering:pixelated;          /* 像素味 */
+    touch-action:none;                  /* 触屏滑动留给游戏，不滚页面 */
   }
   /* 扫描线：盖在画面上的细横线 + 一条慢慢下移的亮带 */
   .scanlines{
@@ -231,6 +232,41 @@
     .brand{ letter-spacing:2px; font-size:18px; }
   }
 
+  /* ---------- 屏上十字键：没键盘也能玩 ---------- */
+  .padwrap{ display:flex; justify-content:center; }
+  .dpad{
+    display:grid; grid-template-columns:repeat(3,58px); grid-template-rows:repeat(3,58px);
+    gap:7px; padding:12px; border-radius:22px; touch-action:none;
+    background:linear-gradient(180deg,var(--wood-2),var(--wood-3));
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,.22),
+      inset 0 -6px 10px rgba(0,0,0,.35),
+      0 14px 26px rgba(60,32,8,.4);
+  }
+  .dbtn{
+    border:none; cursor:pointer; position:relative; border-radius:14px;
+    background:radial-gradient(circle at 36% 30%, #3d2716, #1d0f05 78%);
+    box-shadow:0 4px 0 #120a04, 0 6px 10px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);
+    transition:transform .05s, box-shadow .05s;
+  }
+  .dbtn:active, .dbtn.hit{ transform:translateY(3px); box-shadow:0 1px 0 #120a04, inset 0 1px 0 rgba(255,255,255,.1); }
+  .dbtn i{ /* 方向三角（金色小箭头） */
+    position:absolute; left:50%; top:50%; width:0; height:0;
+    transform:translate(-50%,-50%);
+    border-left:9px solid transparent; border-right:9px solid transparent;
+    border-bottom:12px solid rgba(244,201,107,.85);
+  }
+  .dbtn.left i{ transform:translate(-50%,-50%) rotate(-90deg); }
+  .dbtn.right i{ transform:translate(-50%,-50%) rotate(90deg); }
+  .dbtn.down i{ transform:translate(-50%,-50%) rotate(180deg); }
+  .dbtn.mid{ border-radius:50%; background:radial-gradient(circle at 36% 30%, #6a4a24, #38220c 78%); }
+  .dbtn.mid::after{ content:''; position:absolute; inset:14px; border-radius:50%;
+    background:radial-gradient(circle at 36% 30%, var(--gold), #a87e2e);
+    box-shadow:0 0 8px rgba(244,201,107,.5);
+  }
+  .dbtn.up{ grid-area:1/2; } .dbtn.left{ grid-area:2/1; } .dbtn.mid{ grid-area:2/2; }
+  .dbtn.right{ grid-area:2/3; } .dbtn.down{ grid-area:3/2; }
+
   /* ---------- 说明书小卡片（贴在电视下方） ---------- */
   .manual{
     position:relative; width:min(560px,92vw);
@@ -307,11 +343,23 @@
       <div class="feet"><span></span><span></span></div>
     </div>
 
+    <!-- 屏上十字键：触屏 / 没键盘也能玩 -->
+    <div class="padwrap">
+      <div class="dpad" aria-label="方向键">
+        <button class="dbtn up"    data-dir="0,-1" aria-label="上"><i></i></button>
+        <button class="dbtn left"  data-dir="-1,0" aria-label="左"><i></i></button>
+        <button class="dbtn mid"   id="padMid" aria-label="出发或暂停"></button>
+        <button class="dbtn right" data-dir="1,0"  aria-label="右"><i></i></button>
+        <button class="dbtn down"  data-dir="0,1"  aria-label="下"><i></i></button>
+      </div>
+    </div>
+
     <!-- 使用小卡 -->
     <div class="manual">
       <h3>使用小卡 · 萌牌电视</h3>
       <p>
         按面板 <b>1 / 2</b> 换台（也可直接按键盘 <kbd>1</kbd><kbd>2</kbd>），换台时会有一点雪花，属正常现象。<br>
+        <b>没有键盘？</b>用电视下方的<b>十字键</b>，或直接在屏幕上<b>滑动</b>。<br>
         <b>频道 1 贪吃蛇</b>：方向键（或 WASD）控制，<kbd>空格</kbd> 暂停 / 继续，撞墙撞自己会结束。<br>
         <b>频道 2 · 2048</b>：方向键滑动合并，相同数字碰一起会变大，合出 2048 就赢啦。<br>
         <kbd>R</kbd> 或面板 <b>重来</b> 键：重新开始当前游戏；<kbd>M</kbd> 或音效旋钮：开关音效（默认安静）。<br>
@@ -1004,19 +1052,20 @@ window.addEventListener('keydown', function (e) {
   if (k === 'r' || k === 'R') { resetCurrent(); return; }
 
   if (k === ' ') {  // 空格：贪吃蛇暂停/继续；死掉时直接重开
-    if (state === 'snake') {
-      if (S.dead) initSnake();
-      else if (S.running) S.paused = !S.paused;
-    }
+    inputSpace();
     return;
   }
 
   var d = DIRS[k];
-  if (!d || state !== 'snake' && state !== 'g2048') return;
+  if (d) inputDir(d);
+});
 
+/* 方向 / 空格的统一入口：键盘、屏上十字键、屏幕滑动都走这里 */
+function inputDir(d) {
+  if (state !== 'snake' && state !== 'g2048') return;
   if (state === 'snake') {
     if (S.dead) return;
-    if (!S.running) {              // 第一次按方向键：出发！
+    if (!S.running) {              // 第一次按方向：出发！
       S.running = true;
       S.lastStep = performance.now();
       S.acc = 0;
@@ -1025,7 +1074,14 @@ window.addEventListener('keydown', function (e) {
   } else {
     tryMove(DIR_INDEX[d.x + ',' + d.y]);
   }
-});
+}
+
+function inputSpace() {
+  if (state !== 'snake') return;
+  if (S.dead) { initSnake(); return; }
+  if (!S.running) { S.running = true; S.lastStep = performance.now(); S.acc = 0; return; }
+  S.paused = !S.paused;
+}
 
 /* ---------- 面板按钮 ---------- */
 document.getElementById('ch1').addEventListener('click', function () { switchChannel(1); });
@@ -1033,6 +1089,34 @@ document.getElementById('ch2').addEventListener('click', function () { switchCha
 document.getElementById('resetBtn').addEventListener('click', resetCurrent);
 document.getElementById('powerKnob').addEventListener('click', reboot);
 document.getElementById('soundKnob').addEventListener('click', toggleSound);
+
+/* ---------- 屏上十字键 ---------- */
+document.querySelectorAll('.dbtn[data-dir]').forEach(function (b) {
+  b.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    var p = b.dataset.dir.split(',');
+    Sfx.click();
+    inputDir({ x: +p[0], y: +p[1] });
+    b.classList.add('hit');
+    setTimeout(function () { b.classList.remove('hit'); }, 130);
+  });
+});
+document.getElementById('padMid').addEventListener('pointerdown', function (e) {
+  e.preventDefault(); Sfx.click(); inputSpace();
+});
+
+/* ---------- 屏幕滑动（十字键之外的手势） ---------- */
+var swipeStart = null;
+cv.addEventListener('pointerdown', function (e) { swipeStart = { x: e.clientX, y: e.clientY }; });
+window.addEventListener('pointerup', function (e) {
+  if (!swipeStart) return;
+  var dx = e.clientX - swipeStart.x, dy = e.clientY - swipeStart.y;
+  swipeStart = null;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;   // 抖一下不算滑动
+  inputDir(Math.abs(dx) > Math.abs(dy)
+    ? { x: (dx > 0 ? 1 : -1), y: 0 }
+    : { x: 0, y: (dy > 0 ? 1 : -1) });
+});
 
 /* ---------- 通电！ ---------- */
 S.high = parseInt(store.get(K_SNAKE, '0'), 10) || 0;
