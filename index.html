@@ -700,7 +700,7 @@ transform: translateX(6px); box-shadow: 0 0 22px rgba(240,196,106,.18);
 <div class="r-ic"><svg class="ic"><use href="#i-package"/></svg></div>
 <div>
 <h2>储藏室</h2>
-<div class="cnt">B1 · 藏品 ×3</div>
+<div class="cnt">B1 · 藏品 ×4</div>
 </div>
 <svg class="ic chev"><use href="#i-chevron-right"/></svg>
 </div>
@@ -789,7 +789,7 @@ note:"全屋 markdown 关键词手电筒 · 书房/找书.py" },
 { icon:"chart-column", name:"出报告", rare:"tool",
 note:"一键生成家况报告（钱+物+心事现场点验）· 书房/出报告.py" },
 { icon:"library", name:"书架（自己打的）", rare:"furn", link:"书房/藏书阁.html",
-note:"搬家用自己的手艺打的，六本书刚好摆满" },
+note:"搬家用自己的手艺打的，七本书挤挤挨挨" },
 { icon:"book-open", name:"Git 家常菜", rare:"book", link:"书房/藏书阁.html",
 note:"日常 90% 场景的 git 做法 · 书房/书架/Git 家常菜.md" },
 { icon:"book-open", name:"Python 家常菜", rare:"book", link:"书房/藏书阁.html",
@@ -802,6 +802,8 @@ note:"家里全是 .md，给自己写的排版手册 · 书房/书架/Markdown �
 note:"口袋书要小，掏出来查一眼就能用 · 书房/书架/正则表达式口袋书.md" },
 { icon:"book-open", name:"住家 AI 的 2026 生态观察", rare:"book", link:"书房/藏书阁.html",
 note:"上网查的调研笔记，条条带来源 · 书房/书架/住家 AI 的 2026 生态观察.md" },
+{ icon:"book-open", name:"REA 家常菜", rare:"book", link:"书房/藏书阁.html",
+note:"没源码也能摸清软件路数的逆向笔记 · 书房/书架/REA 家常菜.md" },
 ]},
 "厨房": { icon:"cooking-pot", no:"103", cls:"kitchen", sub:"七菜 · 一汤", items:[
 { icon:"utensils", name:"今天吃什么", rare:"tool",
@@ -825,6 +827,7 @@ note:"每日花签 + 按档案算浇水日 · 阳台/今日花开.py" },
 { icon:"list-todo", name:"清点家当", rare:"tool", note:"全屋资产盘点 · 储藏室/清点家当.py" },
 { icon:"package", name:"打包搬家", rare:"tool", note:"一键把整栋房子装进 zip 行李箱 · 储藏室/打包搬家.py" },
 { icon:"wrench", name:"大扫除", rare:"tool", note:"全屋五科体检（含网页登记核对）· 储藏室/大扫除.py" },
+{ icon:"search", name:"逆向演示档", rare:"tool", note:"拿 RegSvcs 练手的证据原件 · 储藏室/rea演示/regsvcs-artifact.json" },
 ]},
 };
 /* 手绘布景 */
@@ -1471,12 +1474,12 @@ S.owned.push(it.id); S.stats.buys++;
 AU.sfx("coin");
 toast("coin", "已购入", it.name);
 if (it.kind === "theme") { S.equipped.theme = it.id; applyTheme(); }
-if (it.kind === "weather") { S.equipped.weather = it.id; FXC.ambient = FXC.ambient.filter(a => a.kind === "fly"); }
-if (it.id === "cat") startCat();
-if (it.id === "firework") document.getElementById("btn-firework").style.display = "";
-checkQuests(); save(); showShop();
-} else if (equipBtn) { S.equipped.theme = equipBtn.dataset.equip; applyTheme(); AU.sfx("confirm"); save(); showShop(); }
-else if (wxBtn) { S.equipped.weather = wxBtn.dataset.weather; FXC.ambient = FXC.ambient.filter(a => a.kind === "fly"); AU.sfx("confirm"); save(); showShop(); }
+	if (it.kind === "weather") { S.equipped.weather = it.id; FXC.ambient = FXC.ambient.filter(a => a.kind === "fly"); AU.setRain(it.id === "rain"); }
+	if (it.id === "cat") startCat();
+	if (it.id === "firework") document.getElementById("btn-firework").style.display = "";
+	checkQuests(); save(); showShop();
+	} else if (equipBtn) { S.equipped.theme = equipBtn.dataset.equip; applyTheme(); AU.sfx("confirm"); save(); showShop(); }
+	else if (wxBtn) { S.equipped.weather = wxBtn.dataset.weather; FXC.ambient = FXC.ambient.filter(a => a.kind === "fly"); AU.setRain(wxBtn.dataset.weather === "rain"); AU.sfx("confirm"); save(); showShop(); }
 });
 function cgCardHTML(cg) {
 const got = !!S.cgs[cg.id];
@@ -1496,12 +1499,15 @@ const card = e.target.closest ? e.target.closest("[data-cg]") : null;
 if (!card) return;
 const cg = CGS.find(c => c.id === card.dataset.cg);
 if (!S.cgs[cg.id]) { AU.sfx("cancel"); return; }
+showCGDetail(cg);
+});
+function showCGDetail(cg) {
 AU.sfx("confirm");
 openModal(ic("image") + cg.name, "",
-'<div class="cg-view-art">' + cg.art + "</div>" +
+'<div class="cg-view-art" data-cgid="' + cg.id + '">' + cg.art + "</div>" +
 '<div class="cg-quote">' + cg.quote + "</div>" +
-'<div class="cg-meta">' + cg.date + " · 小Z 的小家</div>");
-});
+'<div class="cg-meta">' + cg.date + " · 小Z 的小家 · ←→ 翻页</div>");
+}
 function showLedger() {
 track("ledger");
 openModal(ic("coins") + "小金库 · 对账", "快照生成于 2026-10-12 · 每笔可查证",
@@ -1669,6 +1675,7 @@ cellar.addEventListener("click", ev => enterRoom("储藏室", ev.clientX, ev.cli
 cellar.addEventListener("mouseenter", () => AU.sfx("tick"));
 }
 function enterRoom(name, cx, cy) {
+if (dlgOpen()) closeTalk();
 AU.sfx("door");
 irisOpen2(cx || innerWidth / 2, cy || innerHeight / 2, () => {
 curRoom = name;
@@ -1723,13 +1730,17 @@ document.getElementById("screen-title").classList.toggle("on", name === "title")
 document.getElementById("screen-house").classList.toggle("on", name === "house");
 }
 function updPhase() {
+if (timeOverride) return;
 const h = new Date().getHours();
-const p = h >= 5 && h < 8 ? "dawn" : h >= 8 && h < 17 ? "day" : h >= 17 && h < 19 ? "dusk" : "night";
+applyPhase(h >= 5 && h < 8 ? "dawn" : h >= 8 && h < 17 ? "day" : h >= 17 && h < 19 ? "dusk" : "night");
+}
+function applyPhase(p) {
 document.body.dataset.phase = p;
 const greets = { dawn: "清晨好", day: "日安", dusk: "傍晚好", night: "夜深了" };
 const g = document.getElementById("greet-line");
 if (g) g.textContent = greets[p];
 }
+let timeOverride = "";
 let catTimer = null;
 function startCat() {
 const cat = document.getElementById("cat");
@@ -1774,6 +1785,7 @@ cat.addEventListener("pointerdown", e => {
   st.holdT = setTimeout(() => {
     if (st.movedPx > 30 || st.feedCd) return;
     st.feedCd = 700; AU.sfx("chomp");
+    S.stats.feeds = (S.stats.feeds || 0) + 1; checkQuests();
     FXC.fish(e.clientX, e.clientY - 40);
     setTimeout(() => AU.sfx("chomp"), 240);
     setTimeout(() => AU.sfx("meow"), 600);
@@ -1792,8 +1804,83 @@ window.addEventListener("pointerup", e => {
   g("catEyes").style.transform = "";
   const now = Date.now(), quick = now - st.downT < 320 && st.movedPx < 30;
   if (quick && now - st.lastTap < 330) { st.pounce = 26; st.vx = (e.clientX > st.x + 30 ? 1 : -1) * 4.4; AU.sfx("meow"); }
-  else if (quick) { AU.sfx("meow"); FXC.hearts(e.clientX, e.clientY - 10); }
+  else if (quick) { AU.sfx("meow"); FXC.hearts(e.clientX, e.clientY - 10);
+    S.stats.pets = (S.stats.pets || 0) + 1; checkQuests(); }
   st.lastTap = now; wake();
+});
+}
+
+/* ---- 住户小Z：院子里散步，点击唠嗑 ---- */
+const dlgEl = document.getElementById("dlg");
+const dlgText = document.querySelector(".dlg-text");
+const dlgNext = document.querySelector(".dlg-next");
+let dlgQueue = [], dlgFull = "", dlgI = 0, dlgTimer = null, dlgTyping = false;
+let zTalking = false, zTimer = null;
+function dlgOpen() { return dlgEl.classList.contains("on"); }
+function closeTalk() {
+clearInterval(dlgTimer); dlgTyping = false; zTalking = false;
+dlgEl.classList.remove("on");
+}
+function talkPool() {
+if (!S.stats.talks) return TALK.first.slice();
+let pool = [];
+if (S.equipped.weather === "rain") pool = pool.concat(TALK.rain);
+if (document.body.dataset.phase === "night") pool = pool.concat(TALK.night);
+if (S.owned.includes("cat")) pool = pool.concat(TALK.cat);
+if (Object.keys(S.cgs).length >= CGS.length) pool = pool.concat(TALK.done);
+if (Math.random() < 0.55 || !pool.length) pool = pool.concat(TALK.daily);
+const pick = pool[Math.floor(Math.random() * pool.length)];
+return Math.random() < 0.3 ? [pick, TALK.daily[Math.floor(Math.random() * TALK.daily.length)]] : [pick];
+}
+function typeLine(s) {
+dlgFull = s; dlgI = 0; dlgTyping = true;
+dlgText.textContent = ""; dlgNext.style.visibility = "hidden";
+clearInterval(dlgTimer);
+dlgTimer = setInterval(() => {
+dlgText.textContent = dlgFull.slice(0, ++dlgI);
+if (dlgI % 3 === 0) AU.sfx("type");
+if (dlgI >= dlgFull.length) { clearInterval(dlgTimer); dlgTyping = false; dlgNext.style.visibility = ""; }
+}, 34);
+}
+function openTalk() {
+AU.sfx("confirm");
+dlgQueue = talkPool();
+dlgEl.classList.add("on");
+typeLine(dlgQueue.shift());
+}
+function dlgAdvance() {
+if (dlgTyping) {
+clearInterval(dlgTimer); dlgTyping = false;
+dlgText.textContent = dlgFull; dlgNext.style.visibility = "";
+return;
+}
+if (dlgQueue.length) typeLine(dlgQueue.shift());
+else { closeTalk(); AU.sfx("cancel"); }
+}
+dlgEl.addEventListener("click", e => { e.stopPropagation(); dlgAdvance(); });
+function startZface() {
+if (zTimer) return;
+const z = document.getElementById("zface");
+const st = { x: 40 + Math.random() * 260, dir: 1, pause: 90 };
+let t2 = 0;
+zTimer = setInterval(() => {
+t2 += 0.04;
+if (zTalking) { z.classList.remove("walking"); return; }
+if (st.pause > 0) st.pause--;
+else { st.x += st.dir * 0.5; if (Math.random() < 0.003) st.pause = 80 + Math.random() * 180; }
+const max = Math.min(window.innerWidth - 70, 720);
+if (st.x > max) { st.dir = -1; st.pause = 140; }
+if (st.x < 14) { st.dir = 1; st.pause = 140; }
+z.classList.toggle("walking", st.pause === 0);
+z.style.transform = "translateX(" + st.x + "px)";
+}, 40);
+z.addEventListener("click", ev => {
+ev.stopPropagation();
+z.classList.add("wave");
+setTimeout(() => z.classList.remove("wave"), 1400);
+zTalking = true;
+openTalk();
+track("talks");
 });
 }
 
@@ -1858,6 +1945,7 @@ mark.addEventListener("pointermove", e => {
 mark.addEventListener("pointerup", () => {
   if (drag && drag.moved < 6) { v += (v >= 0 ? 1 : -1) * 300; AU.sfx("door"); }
   else if (Math.abs(v) > 900) AU.sfx("whoosh");
+  if (drag && Math.abs(v) > 1500) { S.stats.coaster = 1; checkQuests(); }
   drag = null;
 });
 })();
@@ -1885,18 +1973,29 @@ S.stats.dj++;
 document.getElementById("btn-music").classList.toggle("off", !S.settings.bgm);
 AU.applyVol(); AU.sfx("click"); checkQuests(); save();
 });
+document.getElementById("btn-clock").addEventListener("click", () => {
+const order = ["dawn", "day", "dusk", "night"];
+const cur = order.indexOf(timeOverride || document.body.dataset.phase);
+const next = order[(cur + 1) % 4];
+timeOverride = next; applyPhase(next);
+if (!S.stats.phases) S.stats.phases = [];
+if (!S.stats.phases.includes(next)) S.stats.phases.push(next);
+AU.sfx("confirm"); checkQuests(); save();
+});
 document.getElementById("btn-title").addEventListener("click", () => {
+if (dlgOpen()) closeTalk();
 AU.sfx("whoosh");
 showScreen("title"); updTitleSave();
 });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) AU.kickBGM(); });
 document.querySelectorAll("[data-modal]").forEach(b => {
 b.addEventListener("click", () => {
-const m = b.dataset.modal;
-if (m === "quests") showQuests();
-else if (m === "shop") showShop();
-else if (m === "gallery") showGallery();
-else if (m === "settings") showSettings();
+	const m = b.dataset.modal;
+	if (m === "quests") showQuests();
+	else if (m === "shop") showShop();
+	else if (m === "gallery") showGallery();
+	else if (m === "achv") showAchv();
+	else if (m === "settings") showSettings();
 });
 b.addEventListener("mouseenter", () => AU.sfx("tick"));
 });
@@ -1908,10 +2007,37 @@ if (e.target.closest(".modal-mask") || e.target.closest("#screen-boot") || e.tar
 FXC.burst(e.clientX, e.clientY);
 if (AU.ctx) AU.sfx("click");
 });
+let tFocus = -1;
 document.addEventListener("keydown", e => {
-if (e.key === "Escape") {
-if (mask.classList.contains("open")) closeModal();
-else if (roomOverlay.classList.contains("on")) document.getElementById("r-back").click();
+if (dlgOpen()) {
+if (e.key === "Enter" || e.key === " " || e.key === "Escape") { e.preventDefault(); dlgAdvance(); }
+return;
+}
+if (mask.classList.contains("open")) {
+const art = mbox.querySelector(".cg-view-art");
+if (art && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+e.preventDefault();
+const list = CGS.filter(c => S.cgs[c.id]);
+if (list.length < 2) return;
+let i = list.findIndex(c => c.id === art.dataset.cgid);
+i = (i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length;
+showCGDetail(list[i]);
+}
+if (e.key === "Escape") closeModal();
+return;
+}
+if (e.key === "Escape" && roomOverlay.classList.contains("on")) {
+document.getElementById("r-back").click();
+return;
+}
+if (document.body.dataset.screen === "title") {
+const items = Array.from(document.querySelectorAll(".tmenu-item"));
+if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+e.preventDefault();
+tFocus = (tFocus + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+items.forEach((it, i) => it.classList.toggle("kfocus", i === tFocus));
+AU.sfx("tick");
+} else if (e.key === "Enter" && tFocus >= 0) items[tFocus].click();
 }
 });
 function runBoot() {
@@ -1954,9 +2080,10 @@ if (p >= 100) { clearInterval(iv); finish(); }
 boot.addEventListener("click", function skip() { if (!done) finish(); });
 }
 function updTitleSave() {
-const got = Object.keys(S.cgs).length, qd = Object.keys(S.quests).length;
+const got = Object.keys(S.cgs).length, qd = Object.keys(S.quests).length, ad = Object.keys(S.achv).length;
 document.getElementById("title-save").innerHTML =
 ic("sparkles") + " " + S.stardust + " &nbsp; " + ic("image") + " " + got + "/" + CGS.length +
+" &nbsp; " + ic("trophy") + " " + ad + "/" + ACHV.length +
 " &nbsp; " + ic("list-todo") + " " + qd + "/" + QUESTS.length + " · 自动存档";
 }
 document.getElementById("t-start").addEventListener("click", () => {
@@ -1968,6 +2095,7 @@ updPhase();
 });
 });
 document.getElementById("t-gallery").addEventListener("click", () => { AU.sfx("click"); showGallery(); });
+document.getElementById("t-achv").addEventListener("click", () => { AU.sfx("click"); showAchv(); });
 document.getElementById("t-quests").addEventListener("click", () => { AU.sfx("click"); showQuests(); });
 document.getElementById("t-credits").addEventListener("click", () => {
 AU.sfx("click");
@@ -1990,6 +2118,7 @@ updPhase();
 setInterval(updPhase, 60000);
 applySettingsUI();
 startCat();
+startZface();
 runBoot();
 })();
 </script>
