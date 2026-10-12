@@ -526,6 +526,7 @@ border-top: 2px solid #c9a15f; border-bottom: 2px solid #c9a15f; }
 @keyframes platfade { 0% { opacity: 0; } 10% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes plattrack { from { letter-spacing: .8em; } to { letter-spacing: .3em; } }
 body.shake { animation: bodyshake .3s; }
+.pressed { transform: scale(.94) !important; transition: transform .09s !important; z-index: 5; }
 @keyframes bodyshake { 20% { transform: translate(3px, -2px); } 40% { transform: translate(-3px, 2px); } 60% { transform: translate(2px, 1px); } 80% { transform: translate(-1px, -1px); } }
 #pack-wrap { position: fixed; inset: 0; z-index: 150; display: none; align-items: center; justify-content: center;
 background: radial-gradient(ellipse at center, rgba(8,10,18,.5), rgba(8,10,18,.84)); }
@@ -1858,15 +1859,10 @@ AU.sfx("click");
 FXC.burst(ev.clientX, ev.clientY);
 track("item", name + "/" + it.name);
 if (it.ledger) { showLedger(); return; }
-const linkBtn = it.link
-? '<div style="text-align:center;margin:8px 0 2px"><a class="btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:11px 34px;font-size:14px;letter-spacing:4px" href="' + it.link + '">进入 ' + ic("chevron-right") + "</a></div>"
-: "";
-openModal(ic(it.icon) + it.name, RARE_NAME[it.rare], linkBtn);
-const ent = document.querySelector("#m-body a.btn");
-if (ent && it.link) ent.addEventListener("click", ev => {
-if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) return;
-ev.preventDefault(); closeModal(); openRoomPage(it.link, ev.clientX, ev.clientY);
-});
+if (it.link) {
+if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) { window.open(it.link, "_blank", "noopener"); return; }
+openRoomPage(it.link, ev.clientX, ev.clientY);
+}
 });
 slot.addEventListener("mouseenter", () => AU.sfx("tick"));
 });
@@ -2181,9 +2177,10 @@ b.addEventListener("click", () => {
 b.addEventListener("mouseenter", () => AU.sfx("tick"));
 });
 
-document.getElementById("pill-stardust").addEventListener("click", () =>
-toast("info", "星尘", "我的积分"));
+document.getElementById("pill-stardust").addEventListener("click", () => showShop());
 document.addEventListener("pointerdown", e => {
+const pr = e.target.closest(".ico-btn,.btn,.pill,.room,.inv-slot,.cg-card,.s-card,.cup-card,.tmenu-item,.back,.toggle,.sb,.danger-btn,#frame-back,#music-info");
+if (pr) { pr.classList.add("pressed"); setTimeout(() => pr.classList.remove("pressed"), 190); }
 if (e.target.closest(".modal-mask") || e.target.closest("#screen-boot") || e.target.closest("#iris")) return;
 FXC.burst(e.clientX, e.clientY);
 if (AU.ctx) AU.sfx("click");
