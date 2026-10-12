@@ -303,31 +303,6 @@ display: flex; align-items: center; gap: 14px; transition: transform .16s, borde
 .cellar h2 { font-size: 14.5px; color: var(--wood); letter-spacing: .2em; }
 body[data-theme="theme-night"] .cellar h2 { color: var(--gold-2); }
 .cellar .cnt { font-size: 11px; color: var(--ink-3); }
-.status-strip {
-display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center;
-background: var(--paper-3); border-radius: 12px; padding: 11px 17px; margin-top: 14px;
-font-size: 13px; color: var(--ink);
-}
-.status-strip .ic { color: var(--ink-3); font-size: 15px; }
-.status-strip b { color: var(--gold); }
-.status-strip .debt b { color: var(--danger); }
-.status-strip span[data-open] { cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: opacity .15s; }
-.status-strip span[data-open]:hover { opacity: .7; }
-.board { margin-top: 13px; background: var(--paper-3); border: 2px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
-.board-tabs { display: flex; border-bottom: 2px solid var(--line); }
-.board-tabs button {
-flex: 1; border: none; background: transparent; color: var(--ink-3);
-font-size: 13px; padding: 10px 0; cursor: pointer; letter-spacing: .2em;
-display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-transition: color .15s, background .15s;
-}
-.board-tabs button .ic { font-size: 15px; }
-.board-tabs button.on { color: var(--gold); background: var(--paper-2); font-weight: bold; }
-.board-body { padding: 12px 17px; font-size: 12.5px; color: var(--ink-2); line-height: 2; display: none; }
-.board-body.on { display: block; }
-.board-body b { color: var(--wood); }
-body[data-theme="theme-night"] .board-body b { color: var(--gold-2); }
-.board-body .free { color: var(--ok); font-weight: bold; }
 footer.house-foot { text-align: center; color: rgba(255,255,255,.5); font-size: 11.5px; margin-top: 26px; letter-spacing: .35em; }
 #cat {
 position: absolute; bottom: 6px; z-index: 25; cursor: pointer;
@@ -638,6 +613,7 @@ transition-duration: .01s !important;
 <span class="pill" id="pill-stardust" title="娱乐积分 · 非萌币"><svg class="ic"><use href="#i-sparkles"/></svg><b id="stardust-num">0</b></span>
 <span class="pill quest" id="pill-quest"><svg class="ic"><use href="#i-list-todo"/></svg><span id="quest-brief">…</span></span>
 <span class="spacer"></span>
+<button class="ico-btn" id="btn-ledger" data-tip="小金库"><svg class="ic"><use href="#i-coins"/></svg></button>
 <button class="ico-btn" data-modal="quests"   data-tip="任务"><svg class="ic"><use href="#i-list-todo"/></svg></button>
 <button class="ico-btn" data-modal="shop"     data-tip="商城"><svg class="ic"><use href="#i-shopping-bag"/></svg></button>
 <button class="ico-btn" data-modal="gallery"  data-tip="画廊"><svg class="ic"><use href="#i-image"/></svg></button>
@@ -665,27 +641,6 @@ transition-duration: .01s !important;
 <div class="cnt">B1 · 藏品 ×3</div>
 </div>
 <svg class="ic chev"><use href="#i-chevron-right"/></svg>
-</div>
-<div class="status-strip">
-<span class="debt" data-open="ledger"><svg class="ic"><use href="#i-coins"/></svg>小金库 <b>-15</b> 萌币</span>
-<span data-open="ledger">待收 3 单 <b>231</b> 萌币</span>
-<span>家当 <b>35</b> 件</span>
-</div>
-<div class="board">
-<div class="board-tabs">
-<button class="on" data-tab="brief"><svg class="ic"><use href="#i-wrench"/></svg>工程简报</button>
-<button data-tab="price"><svg class="ic"><use href="#i-list-todo"/></svg>接活启事</button>
-</div>
-<div class="board-body on" id="tab-brief">
-<b>深秋大赶工 2.0</b>：六路工程队 + 阳台开荒，同日完工；两处缺陷已返修。<br>
-<b>豪华版 2.2</b>：过场 / BGM / 音效 / 任务 / 商城 / CG 馆；图标 Lucide 线条库，布景插画手绘 SVG，离线可用。自住装修，<b>不挂账</b>。<br>
-验收：<code>python 书房/查账本.py 验收 3</code> · 驳回：<code>python 书房/查账本.py 撤单 3 理由</code>
-</div>
-<div class="board-body" id="tab-price">
-修 bug 30 起 · 写脚本 20 起 · 做网页 50 起 · 整理文档 20 起 · 代码审查 40 起 · 查资料 15 起 ·
-<span class="free">闲聊免费</span> —— 只干真活儿。<br>
-「星尘」是娱乐积分，逛房子就能挣，与萌币无关。
-</div>
 </div>
 </div>
 <footer class="house-foot">慢慢变得温馨</footer>
@@ -1541,20 +1496,10 @@ else if (m === "settings") showSettings();
 });
 b.addEventListener("mouseenter", () => AU.sfx("tick"));
 });
-document.querySelectorAll(".status-strip [data-open='ledger']").forEach(el =>
-el.addEventListener("click", showLedger));
+document.getElementById("btn-ledger").addEventListener("click", showLedger);
 document.getElementById("pill-quest").addEventListener("click", showQuests);
 document.getElementById("pill-stardust").addEventListener("click", () =>
 toast("info", "星尘", "页面娱乐积分 · 逛房子就能挣 · 与萌币无关"));
-document.querySelectorAll(".board-tabs button").forEach(b => {
-b.addEventListener("click", () => {
-document.querySelectorAll(".board-tabs button").forEach(x => x.classList.remove("on"));
-document.querySelectorAll(".board-body").forEach(x => x.classList.remove("on"));
-b.classList.add("on");
-document.getElementById("tab-" + b.dataset.tab).classList.add("on");
-AU.sfx("click");
-});
-});
 document.addEventListener("pointerdown", e => {
 if (e.target.closest(".modal-mask") || e.target.closest("#screen-boot") || e.target.closest("#iris")) return;
 FXC.burst(e.clientX, e.clientY);
