@@ -429,6 +429,13 @@ body.ringing #status { color: var(--warm); }
   .machine { width: min(60vw, 52vh, 320px); }
   .stage { gap: 12px; padding-top: 16px; }
 }
+
+/* ---- 全屋统一滚动条 ---- */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#a8895c;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:#8a6a3e}
+*{scrollbar-width:thin;scrollbar-color:#a8895c transparent}
 </style>
 </head>
 <body>

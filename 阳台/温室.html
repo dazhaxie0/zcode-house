@@ -44,6 +44,13 @@ canvas.drag{cursor:grabbing}
 .windrow{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-2);letter-spacing:1px}
 .windrow input{accent-color:var(--gold);width:110px}
 @media(max-width:820px){.wrap{flex-direction:column}.panel{min-width:0}.arch{max-height:none}}
+
+/* ---- 全屋统一滚动条 ---- */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#a8895c;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:#8a6a3e}
+*{scrollbar-width:thin;scrollbar-color:#a8895c transparent}
 </style>
 </head>
 <body>
